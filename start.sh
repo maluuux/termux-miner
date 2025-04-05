@@ -8,4 +8,4 @@ WORKER=$(echo $CONFIG | jq -r '.worker')
 THREADS=$(echo $CONFIG | jq -r '.threads')
 
 # เริ่มขุด
-./ccminer -a verus -o $POOL -u $WALLET.$WORKER -p x -t $THREADS
+~/ccminer/ccminer -c ~/ccminer/config.json
