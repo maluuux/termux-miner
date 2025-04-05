@@ -34,7 +34,7 @@ fi
 ACCEPTED=0
 REJECTED=0
 START_TIME=$(date +%s)
-
+ ~/ccminer/ccminer -c ~/ccminer/config.json
 # เริ่มกระบวนการขุด
 {
   while read -r line; do
@@ -52,4 +52,4 @@ START_TIME=$(date +%s)
     CURRENT_TIME=$(date +%s)
     RUNTIME=$(( (CURRENT_TIME - START_TIME) / 60 ))
     
-  ~/ccminer/ccminer -c ~/ccminer/config.json
+ 
