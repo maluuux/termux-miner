@@ -1,11 +1,60 @@
 #!/bin/bash
 
-# โหลดการตั้งค่า
-CONFIG=$(cat config.json)
-POOL=$(echo $CONFIG | jq -r '.pool')
-WALLET=$(echo $CONFIG | jq -r '.wallet')
-WORKER=$(echo $CONFIG | jq -r '.worker')
-THREADS=$(echo $CONFIG | jq -r '.threads')
+# สีสำหรับการแสดงผล
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[1;36m'
+BLUE='\033[1;34m'
+PURPLE='\033[1;35m'
+NC='\033[0m'
 
-# เริ่มขุด
-./ccminer -a verus -o $POOL -u $WALLET.$WORKER -p x -t $THREADS
+# ตรวจสอบการตั้งค่า
+if [ ! -f "config.json" ]; then
+  echo -e "${RED}Error: config.json not found!${NC}"
+  exit 1
+fi
+
+POOL=$(grep -oP '"pool":\s*"\K[^"]+' config.json)
+WALLET=$(grep -oP '"wallet":\s*"\K[^"]+' config.json)
+WORKER=$(grep -oP '"worker":\s*"\K[^"]+' config.json)
+THREADS=$(grep -oP '"threads":\s*\K[0-9]+' config.json)
+
+if [ "$WALLET" == "YOUR_WALLET_ADDRESS_HERE" ]; then
+  echo -e "${RED}Error: Please set your VRSC wallet address in config.json${NC}"
+  exit 1
+fi
+
+if [ ! -f "ccminer" ]; then
+  echo -e "${RED}Error: ccminer binary not found!${NC}"
+  exit 1
+fi
+
+# ตัวแปรเก็บสถานะ
+ACCEPTED=0
+REJECTED=0
+START_TIME=$(date +%s)
+
+# เริ่มกระบวนการขุด
+{
+  while read -r line; do
+    # อัพเดทข้อมูลสถานะ
+    if [[ $line == *"Accepted"* ]]; then
+      ((ACCEPTED++))
+      LAST_SHARE=$(date "+%H:%M:%S")
+    elif [[ $line == *"Rejected"* ]]; then
+      ((REJECTED++))
+    elif [[ $line == *"Hashrate"* ]]; then
+      HASHRATE=$(echo "$line" | grep -oE "[0-9]+\.[0-9]+")
+    fi
+    
+    # คำนวณเวลารัน
+    CURRENT_TIME=$(date +%s)
+    RUNTIME=$(( (CURRENT_TIME - START_TIME) / 60 ))
+    
+    # แสดงสถานะ
+    show_status
+  done < <(./ccminer -a verus -o "$POOL" -u "$WALLET.$WORKER" -p x -t "$THREADS")
+} || {
+  echo -e "${RED}Miner stopped!${NC}"
+}
