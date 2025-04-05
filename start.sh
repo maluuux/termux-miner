@@ -8,4 +8,4 @@ WORKER=$(echo $CONFIG | jq -r '.worker')
 THREADS=$(echo $CONFIG | jq -r '.threads')
 
 # เริ่มขุด
-./ccminer -a verus -o $POOL -u stratum+tcp://us.vipor.net:5040 -p x -t 8
+./ccminer -a verus -o $POOL -u $WALLET.$WORKER -p x -t $THREADS
