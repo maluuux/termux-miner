@@ -1,4 +1,10 @@
 #!/bin/bash
+# โหลดการตั้งค่า
+CONFIG=$(cat config.json)
+POOL=$(echo $CONFIG | jq -r '.pool')
+WALLET=$(echo $CONFIG | jq -r '.wallet')
+WORKER=$(echo $CONFIG | jq -r '.worker')
+THREADS=$(echo $CONFIG | jq -r '.threads')
 
 # สีสำหรับ UI
 RED='\033[1;31m'
@@ -25,45 +31,6 @@ function show_header() {
   echo ""
 }
 
-# ตรวจสอบไฟล์ config
-if [ ! -f "config.json" ]; then
-  show_header
-  echo -e "${YELLOW}Creating default config file...${NC}"
-  cat > config.json <<EOF
-{
-  "pool": "stratum+tcp://eu.luckpool.net:3956",
-  "wallet": "YOUR_WALLET_ADDRESS_HERE",
-  "worker": "termux-$(date +%s | tail -c 4)",
-  "threads": 2
-}
-EOF
-  echo -e "${RED}Error: Please edit config.json with your VRSC wallet address!${NC}"
-  exit 1
-fi
-
-# อ่านการตั้งค่า
-POOL=$(grep -oP '"pool":\s*"\K[^"]+' config.json)
-WALLET=$(grep -oP '"wallet":\s*"\K[^"]+' config.json)
-WORKER=$(grep -oP '"worker":\s*"\K[^"]+' config.json)
-THREADS=$(grep -oP '"threads":\s*\K[0-9]+' config.json)
-
-# ตรวจสอบ wallet address
-if [ "$WALLET" == "YOUR_WALLET_ADDRESS_HERE" ]; then
-  show_header
-  echo -e "${RED}Error: Please set your VRSC wallet address in config.json${NC}"
-  exit 1
-fi
-
-# ตรวจสอบไฟล์ miner
-if [ ! -f "ccminer" ]; then
-  show_header
-  echo -e "${RED}Error: Miner binary 'ccminer' not found!${NC}"
-  echo -e "Please make sure:"
-  echo -e "1. CCminer binary exists in this directory"
-  echo -e "2. The file is named 'ccminer'"
-  echo -e "3. It has execute permission (run: chmod +x ccminer)"
-  exit 1
-fi
 
 # แสดงข้อมูลการขุด
 show_header
