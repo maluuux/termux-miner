@@ -4,6 +4,7 @@
   "worker": "termux-worker",
   "threads": 8,
   "algo": "verus",
-  "api-allow": "192.168.0.0/16",
-  "api-bind": "0.0.0.0:4068"  
+   "cpu-priority": 1,
+  "cpu-affinity": -1,
+  "retry-pause": 10
 }
