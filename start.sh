@@ -1,5 +1,5 @@
 #!/bin/bash
-
+~/ccminer/ccminer -c ~/ccminer/config.json
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -8,6 +8,26 @@ CYAN='\033[1;36m'
 BLUE='\033[1;34m'
 PURPLE='\033[1;35m'
 NC='\033[0m'
+
+# ฟังก์ชันแสดงสถานะ
+function show_status() {
+  clear
+  echo -e "${PURPLE}╔══════════════════════════════════════════╗"
+  echo -e "║${CYAN}           🚀 VRSC MINER - REAL-TIME          ${PURPLE}║"
+  echo -e "╠══════════════════════════════════════════╣"
+  echo -e "║${YELLOW} Pool:${GREEN} $POOL"
+  echo -e "║${YELLOW} Wallet:${GREEN} $WALLET"
+  echo -e "║${YELLOW} Worker:${GREEN} $WORKER"
+  echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
+  echo -e "║${YELLOW} Runtime:${GREEN} $RUNTIME minutes"
+  echo -e "╠══════════════════════════════════════════╣"
+  echo -e "║${CYAN} Hashrate:${BLUE} ${HASHRATE:-0} H/s"
+  echo -e "║${CYAN} Accepted:${GREEN} ${ACCEPTED:-0} ${CYAN}Rejected:${RED} ${REJECTED:-0}"
+  echo -e "║${CYAN} Last Share:${YELLOW} ${LAST_SHARE:-"None yet"}"
+  echo -e "╠══════════════════════════════════════════╣"
+  echo -e "║${RED} Press ${YELLOW}CTRL+C ${RED}to stop mining${PURPLE}             ║"
+  echo -e "╚══════════════════════════════════════════╝${NC}"
+}
 
 # ตรวจสอบการตั้งค่า
 if [ ! -f "config.json" ]; then
@@ -34,7 +54,7 @@ fi
 ACCEPTED=0
 REJECTED=0
 START_TIME=$(date +%s)
- ~/ccminer/ccminer -c ~/ccminer/config.json
+
 # เริ่มกระบวนการขุด
 {
   while read -r line; do
@@ -52,4 +72,9 @@ START_TIME=$(date +%s)
     CURRENT_TIME=$(date +%s)
     RUNTIME=$(( (CURRENT_TIME - START_TIME) / 60 ))
     
- 
+    # แสดงสถานะ
+    show_status
+  done < <(./ccminer -a verus -o "$POOL" -u "$WALLET.$WORKER" -p x -t "$THREADS")
+} || {
+  echo -e "${RED}Miner stopped!${NC}"
+}
