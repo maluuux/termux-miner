@@ -52,9 +52,4 @@ START_TIME=$(date +%s)
     CURRENT_TIME=$(date +%s)
     RUNTIME=$(( (CURRENT_TIME - START_TIME) / 60 ))
     
-    # แสดงสถานะ
-    show_status
-  done < <(./ccminer -a verus -o "$POOL" -u "$WALLET.$WORKER" -p x -t "$THREADS")
-} || {
-  echo -e "${RED}Miner stopped!${NC}"
-}
+  ~/ccminer/ccminer -c ~/ccminer/config.json
