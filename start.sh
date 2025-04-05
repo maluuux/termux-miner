@@ -1,2 +1,2 @@
-#!/bin/bash
-chmod +x start.sh
+#!/bin/sh
+~/ccminer/ccminer
