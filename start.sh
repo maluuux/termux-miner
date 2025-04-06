@@ -26,7 +26,7 @@ function show_miner_info() {
 
   # อ่านข้อมูลหลัก
   FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
-  WALLET_ADDRESS=$(echo "$FULL_USER" | cut -d'.' -f1)
+  WALLET_ADDRESS=${PURPLE}$(echo "$FULL_USER" | cut -d'.' -f1)
   WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
   ALGO=$(jq -r '.algo' "$CONFIG_FILE")
   THREADS=$(jq -r '.threads' "$CONFIG_FILE")
@@ -47,12 +47,12 @@ function show_miner_info() {
     POOL_NAME=$(echo "$pool" | jq -r '.name')
     POOL_URL=$(echo "$pool" | jq -r '.url')
     POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
-
-    echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${PURPLE}║"
-    
+  
     echo -e " ${YELLOW}$POOL_NAME${NC}"
     echo -e "   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
     echo -e "   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
+   
+    echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            "
   done
   }
 # เรียกใช้งานฟังก์ชัน
