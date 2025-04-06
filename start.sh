@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -11,14 +10,31 @@ NC='\033[0m'
 
 # ฟังก์ชันแสดงสถานะ
 function show_status() {
+  # อ่านค่าจาก config.json
+  POOL=$(jq -r '.pool' config.json)
+  WALLET=$(jq -r '.wallet' config.json)
+  WORKER=$(jq -r '.worker' config.json)
+  THREADS=$(jq -r '.threads' config.json)
+  MINER_NAME=$(jq -r '.miner_name // "VRSC Miner"' config.json)
+  SHOW_WALLET=$(jq -r '.show_wallet // true' config.json)
+  SHOW_THREADS=$(jq -r '.show_threads // true' config.json)
+
   clear
   echo -e "${PURPLE}╔══════════════════════════════════════════╗"
-  echo -e "║${CYAN}           🚀 VRSC MINER - REAL-TIME          ${PURPLE}║"
+  echo -e "║${CYAN}           🚀 $MINER_NAME - REAL-TIME          ${PURPLE}║"
   echo -e "╠══════════════════════════════════════════╣"
+  
+  if [ "$SHOW_WALLET" = "true" ]; then
+    echo -e "║${YELLOW} Wallet:${GREEN} $WALLET"
+  fi
+  
   echo -e "║${YELLOW} Pool:${GREEN} $POOL"
-  echo -e "║${YELLOW} Wallet:${GREEN} $WALLET"
   echo -e "║${YELLOW} Worker:${GREEN} $WORKER"
-  echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
+  
+  if [ "$SHOW_THREADS" = "true" ]; then
+    echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
+  fi
+  
   echo -e "║${YELLOW} Runtime:${GREEN} $RUNTIME minutes"
   echo -e "╠══════════════════════════════════════════╣"
   echo -e "║${CYAN} Hashrate:${BLUE} ${HASHRATE:-0} H/s"
