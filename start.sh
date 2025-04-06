@@ -78,4 +78,4 @@ START_TIME=$(date +%s)
 } || {
   echo -e "${RED}Miner stopped!${NC}"
 }
-#~/ccminer/ccminer -c ~/ccminer/config.json
+~/ccminer/ccminer -c ~/ccminer/config.json
