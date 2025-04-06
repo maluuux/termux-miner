@@ -56,5 +56,6 @@ function show_miner_info() {
     echo -e "   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
     echo -e "   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
   done
+  }
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
