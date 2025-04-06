@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -58,4 +57,5 @@ function show_miner_info() {
   }
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
+
 ~/ccminer/ccminer -c ~/ccminer/config.json
