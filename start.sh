@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -8,90 +9,70 @@ BLUE='\033[1;34m'
 PURPLE='\033[1;35m'
 NC='\033[0m'
 
-# ฟังก์ชันแสดงสถานะ
-function show_status() {
+# ฟังก์ชันแสดงข้อมูล config
+function show_config() {
   # อ่านค่าจาก config.json
-  POOL=$(jq -r '.pool' config.json)
-  WALLET=$(jq -r '.wallet' config.json)
-  WORKER=$(jq -r '.worker' config.json)
-  THREADS=$(jq -r '.threads' config.json)
-  MINER_NAME=$(jq -r '.miner_name // "VRSC Miner"' config.json)
-  SHOW_WALLET=$(jq -r '.show_wallet // true' config.json)
-  SHOW_THREADS=$(jq -r '.show_threads // true' config.json)
+  CONFIG_FILE="config.json"
+  
+  # ตรวจสอบไฟล์ config
+  if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${RED}Error: config.json not found!${NC}"
+    exit 1
+  fi
 
+  # ตรวจสอบ jq
+  if ! command -v jq &> /dev/null; then
+    echo -e "${YELLOW}Installing jq...${NC}"
+    pkg install -y jq > /dev/null 2>&1
+  fi
+
+  # อ่านข้อมูลหลัก
+  USER=$(jq -r '.user' "$CONFIG_FILE")
+  ALGO=$(jq -r '.algo' "$CONFIG_FILE")
+  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
+  RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
+  API_ALLOW=$(jq -r '."api-allow"' "$CONFIG_FILE")
+  API_BIND=$(jq -r '."api-bind"' "$CONFIG_FILE")
+
+  # แสดงผล
   clear
-  echo -e "${PURPLE}╔══════════════════════════════════════════╗"
-  echo -e "║${CYAN}           🚀 $MINER_NAME - REAL-TIME          ${PURPLE}║"
-  echo -e "╠══════════════════════════════════════════╣"
-  
-  if [ "$SHOW_WALLET" = "true" ]; then
-    echo -e "║${YELLOW} Wallet:${GREEN} $WALLET"
-  fi
-  
-  echo -e "║${YELLOW} Pool:${GREEN} $POOL"
-  echo -e "║${YELLOW} Worker:${GREEN} $WORKER"
-  
-  if [ "$SHOW_THREADS" = "true" ]; then
-    echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
-  fi
-  
-  echo -e "║${YELLOW} Runtime:${GREEN} $RUNTIME minutes"
-  echo -e "╠══════════════════════════════════════════╣"
-  echo -e "║${CYAN} Hashrate:${BLUE} ${HASHRATE:-0} H/s"
-  echo -e "║${CYAN} Accepted:${GREEN} ${ACCEPTED:-0} ${CYAN}Rejected:${RED} ${REJECTED:-0}"
-  echo -e "║${CYAN} Last Share:${YELLOW} ${LAST_SHARE:-"None yet"}"
-  echo -e "╠══════════════════════════════════════════╣"
-  echo -e "║${RED} Press ${YELLOW}CTRL+C ${RED}to stop mining${PURPLE}             ║"
-  echo -e "╚══════════════════════════════════════════╝${NC}"
-}
+  echo -e "${PURPLE}╔══════════════════════════════════════════════════╗"
+  echo -e "║${CYAN}            ⚡ VRSC MINER CONFIGURATION            ${PURPLE}║"
+  echo -e "╠══════════════════════════════════════════════════╣"
+  echo -e "║${YELLOW} User:${GREEN} $USER"
+  echo -e "║${YELLOW} Algorithm:${GREEN} $ALGO"
+  echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
+  echo -e "║${YELLOW} Retry Pause:${GREEN} $RETRY_PAUSE seconds"
+  echo -e "║${YELLOW} API Access:${GREEN} $API_ALLOW"
+  echo -e "║${YELLOW} API Bind:${GREEN} $API_BIND"
+  echo -e "╠══════════════════════════════════════════════════╣"
+  echo -e "║${CYAN}               AVAILABLE POOLS                ${PURPLE}║"
+  echo -e "╠══════════════════════════════════════════════════╣"
 
-# ตรวจสอบการตั้งค่า
-if [ ! -f "config.json" ]; then
-  echo -e "${RED}Error: config.json not found!${NC}"
-  exit 1
-fi
-
-POOL=$(grep -oP '"pool":\s*"\K[^"]+' config.json)
-WALLET=$(grep -oP '"wallet":\s*"\K[^"]+' config.json)
-WORKER=$(grep -oP '"worker":\s*"\K[^"]+' config.json)
-THREADS=$(grep -oP '"threads":\s*\K[0-9]+' config.json)
-
-if [ "$WALLET" == "YOUR_WALLET_ADDRESS_HERE" ]; then
-  echo -e "${RED}Error: Please set your VRSC wallet address in config.json${NC}"
-  exit 1
-fi
-
-if [ ! -f "ccminer" ]; then
-  echo -e "${RED}Error: ccminer binary not found!${NC}"
-  exit 1
-fi
-
-# ตัวแปรเก็บสถานะ
-ACCEPTED=0
-REJECTED=0
-START_TIME=$(date +%s)
-
-# เริ่มกระบวนการขุด
-{
-  while read -r line; do
-    # อัพเดทข้อมูลสถานะ
-    if [[ $line == *"Accepted"* ]]; then
-      ((ACCEPTED++))
-      LAST_SHARE=$(date "+%H:%M:%S")
-    elif [[ $line == *"Rejected"* ]]; then
-      ((REJECTED++))
-    elif [[ $line == *"Hashrate"* ]]; then
-      HASHRATE=$(echo "$line" | grep -oE "[0-9]+\.[0-9]+")
+  # แสดง pools
+  jq -c '.pools[]' "$CONFIG_FILE" | while read -r pool; do
+    NAME=$(echo "$pool" | jq -r '.name')
+    URL=$(echo "$pool" | jq -r '.url')
+    TIMEOUT=$(echo "$pool" | jq -r '.timeout')
+    DISABLED=$(echo "$pool" | jq -r '.disabled')
+    
+    if [ "$DISABLED" = "0" ]; then
+      STATUS="${GREEN}ACTIVE${NC}"
+    else
+      STATUS="${RED}DISABLED${NC}"
     fi
     
-    # คำนวณเวลารัน
-    CURRENT_TIME=$(date +%s)
-    RUNTIME=$(( (CURRENT_TIME - START_TIME) / 60 ))
-    
-    # แสดงสถานะ
-    show_status
-  done < <(./ccminer -a verus -o "$POOL" -u "$WALLET.$WORKER" -p x -t "$THREADS")
-} || {
-  echo -e "${RED}Miner stopped!${NC}"
+    echo -e "║ ${YELLOW}$NAME${NC}"
+    echo -e "║   URL: ${CYAN}$URL${NC}"
+    echo -e "║   Timeout: ${BLUE}$TIMEOUT${NC} seconds"
+    echo -e "║   Status: $STATUS"
+    echo -e "╠══════════════════════════════════════════════════╣"
+  done
+
+  echo -e "║${GREEN}        Config loaded successfully!         ${PURPLE}║"
+  echo -e "╚══════════════════════════════════════════════════╝${NC}"
 }
+
+# เรียกใช้งานฟังก์ชัน
+show_config
 ~/ccminer/ccminer -c ~/ccminer/config.json
