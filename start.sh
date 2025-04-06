@@ -54,8 +54,43 @@ jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; d
   
    
     echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${NC}"
-  done
+  }
+
+  # ฟังก์ชันกรองและแสดงผล output ของ CCminer แบบ Premium
+function premium_output_filter() {
+  local hashrate=0
+  local accepted=0
+  local rejected=0
+  local start_time=$(date +%s)
+  local last_share="None yet"
   
-# เรียกใช้งานฟังก์ชัน
+  show_premium_header
+  
+  while read -r line; do
+    # กรองและประมวลผลแต่ละบรรทัด
+    if [[ $line == *"Accepted"* ]]; then
+      ((accepted++))
+      last_share=$(date "+%Y-%m-%d %H:%M:%S")
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"Rejected"* ]]; then
+      ((rejected++))
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"Hashrate"* ]]; then
+      hashrate=$(echo "$line" | grep -oE "[0-9]+\.[0-9]+")
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"New job"* ]]; then
+      pool_url=$(echo "$line" | grep -oE "stratum[^ ]+")
+      show_pool_info "Current Pool" "$pool_url" "${GREEN}ACTIVE${NC}"
+    elif [[ $line == *"error"* || $line == *"failed"* ]]; then
+      show_system_message "$line" "error"
+    elif [[ $line == *"warning"* ]]; then
+      show_system_message "$line" "warning"
+    fi
+  done
+  }
+
+  #เรียกใช้งานฟังก์ชัน
 show_miner_info
+premium_output_filter
+
 ~/ccminer/ccminer -c ~/ccminer/config.json
