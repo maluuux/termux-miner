@@ -44,14 +44,14 @@ jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; d
     echo -e "   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
 
 
-# ส่วนข้อมูล Wallet
-  echo -e "${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
-  echo -e "${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
 
   # ส่วนการตั้งค่าการขุด
   echo -e "${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
   echo -e "${YELLOW} Threads:${CYAN} $THREADS${NC}"
   echo -e "${YELLOW} Retry Pause:${BLUE} $RETRY_PAUSE seconds${NC}"
+# ส่วนข้อมูล Wallet
+  echo -e "${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
+  echo -e "${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
    
 
     echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${NC}"
