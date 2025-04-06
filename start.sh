@@ -9,9 +9,8 @@ BLUE='\033[1;34m'
 PURPLE='\033[1;35m'
 NC='\033[0m'
 
-# ฟังก์ชันแสดงข้อมูล config
-function show_config() {
-  # อ่านค่าจาก config.json
+# ฟังก์ชันแยกและแสดงข้อมูล Wallet
+function show_wallet_info() {
   CONFIG_FILE="config.json"
   
   # ตรวจสอบไฟล์ config
@@ -26,53 +25,30 @@ function show_config() {
     pkg install -y jq > /dev/null 2>&1
   fi
 
-  # อ่านข้อมูลหลัก
-  USER=$(jq -r '.user' "$CONFIG_FILE")
-  ALGO=$(jq -r '.algo' "$CONFIG_FILE")
-  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
-  RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
-  API_ALLOW=$(jq -r '."api-allow"' "$CONFIG_FILE")
-  API_BIND=$(jq -r '."api-bind"' "$CONFIG_FILE")
+  # อ่านข้อมูล Wallet
+  FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
+  
+  # แยกส่วน Wallet และ Worker name
+  WALLET_ADDRESS=$(echo "$FULL_USER" | cut -d'.' -f1)
+  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
 
-  # แสดงผล
+  # แสดงผลแบบสวยงาม
   clear
   echo -e "${PURPLE}╔══════════════════════════════════════════════════╗"
-  echo -e "║${CYAN}            ⚡ VRSC MINER CONFIGURATION            ${PURPLE}║"
+  echo -e "║${CYAN}              💰 WALLET INFORMATION              ${PURPLE}║"
   echo -e "╠══════════════════════════════════════════════════╣"
-  echo -e "║${YELLOW} User:${GREEN} $USER"
-  echo -e "║${YELLOW} Algorithm:${GREEN} $ALGO"
-  echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
-  echo -e "║${YELLOW} Retry Pause:${GREEN} $RETRY_PAUSE seconds"
-  echo -e "║${YELLOW} API Access:${GREEN} $API_ALLOW"
-  echo -e "║${YELLOW} API Bind:${GREEN} $API_BIND"
+  echo -e "║${YELLOW} Full User String:${NC}"
+  echo -e "║   ${GREEN}$FULL_USER${NC}"
   echo -e "╠══════════════════════════════════════════════════╣"
-  echo -e "║${CYAN}               AVAILABLE POOLS                ${PURPLE}║"
+  echo -e "║${YELLOW} Wallet Address:${NC}"
+  echo -e "║   ${CYAN}$WALLET_ADDRESS${NC}"
+  echo -e "║${YELLOW} Worker/Donation Name:${NC}"
+  echo -e "║   ${BLUE}$WORKER_NAME${NC}"
   echo -e "╠══════════════════════════════════════════════════╣"
-
-  # แสดง pools
-  jq -c '.pools[]' "$CONFIG_FILE" | while read -r pool; do
-    NAME=$(echo "$pool" | jq -r '.name')
-    URL=$(echo "$pool" | jq -r '.url')
-    TIMEOUT=$(echo "$pool" | jq -r '.timeout')
-    DISABLED=$(echo "$pool" | jq -r '.disabled')
-    
-    if [ "$DISABLED" = "0" ]; then
-      STATUS="${GREEN}ACTIVE${NC}"
-    else
-      STATUS="${RED}DISABLED${NC}"
-    fi
-    
-    echo -e "║ ${YELLOW}$NAME${NC}"
-    echo -e "║   URL: ${CYAN}$URL${NC}"
-    echo -e "║   Timeout: ${BLUE}$TIMEOUT${NC} seconds"
-    echo -e "║   Status: $STATUS"
-    echo -e "╠══════════════════════════════════════════════════╣"
-  done
-
-  echo -e "║${GREEN}        Config loaded successfully!         ${PURPLE}║"
+  echo -e "║${GREEN}        Information extracted successfully!      ${PURPLE}║"
   echo -e "╚══════════════════════════════════════════════════╝${NC}"
 }
 
 # เรียกใช้งานฟังก์ชัน
-show_config
+show_wallet_info
 ~/ccminer/ccminer -c ~/ccminer/config.json
