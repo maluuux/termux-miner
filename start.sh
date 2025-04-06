@@ -1,5 +1,5 @@
 #!/bin/bash
-~/ccminer/ccminer -c ~/ccminer/config.json
+
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -78,3 +78,4 @@ START_TIME=$(date +%s)
 } || {
   echo -e "${RED}Miner stopped!${NC}"
 }
+#~/ccminer/ccminer -c ~/ccminer/config.json
