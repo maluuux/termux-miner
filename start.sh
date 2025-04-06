@@ -1,5 +1,5 @@
 #!/bin/bash
-~/ccminer/ccminer -c ~/ccminer/config.json
+
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -35,9 +35,6 @@ function show_miner_info() {
 
   # แสดงผล
   clear
-  echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${PURPLE}║"
-  
-  
   # ส่วนข้อมูล Wallet
   echo -e "${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
   echo -e "${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
@@ -51,6 +48,8 @@ function show_miner_info() {
     POOL_NAME=$(echo "$pool" | jq -r '.name')
     POOL_URL=$(echo "$pool" | jq -r '.url')
     POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
+
+    echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${PURPLE}║"
     
     echo -e " ${YELLOW}$POOL_NAME${NC}"
     echo -e "   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
@@ -59,3 +58,4 @@ function show_miner_info() {
   }
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
+~/ccminer/ccminer -c ~/ccminer/config.json
