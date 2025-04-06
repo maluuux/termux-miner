@@ -1,5 +1,5 @@
 #!/bin/bash
-
+~/ccminer/ccminer -c ~/ccminer/config.json
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -64,25 +64,5 @@ function show_miner_info() {
     echo -e "║   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
     echo -e "╠══════════════════════════════════════════════════╣"
   done
-
-  # ส่วน Pools ที่ปิดการใช้งาน
-  DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
-  if [ "$DISABLED_COUNT" -gt 0 ]; then
-    echo -e "║${RED}          DISABLED POOLS ($DISABLED_COUNT)           ${PURPLE}║"
-    echo -e "╠══════════════════════════════════════════════════╣"
-    
-    jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
-      POOL_NAME=$(echo "$pool" | jq -r '.name')
-      echo -e "║ ${RED}$POOL_NAME${NC}"
-    done
-    
-    echo -e "╠══════════════════════════════════════════════════╣"
-  fi
-
-  echo -e "║${GREEN}        Config loaded successfully!         ${PURPLE}║"
-  echo -e "╚══════════════════════════════════════════════════╝${NC}"
-}
-
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
-~/ccminer/ccminer -c ~/ccminer/config.json
