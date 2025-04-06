@@ -25,25 +25,16 @@ function show_miner_info() {
   fi
 
   # อ่านข้อมูลหลัก
-  FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
-  WALLET_ADDRESS=${PURPLE}$(echo "$FULL_USER" | cut -d'.' -f1)
-  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
   ALGO=$(jq -r '.algo' "$CONFIG_FILE")
-  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
   RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
+  WALLE=${PURPLE}$(echo "$FULL_USER" | cut -d'.' -f1)
+  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
+  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
 
+  
   # แสดงผล
   clear
-  # ส่วนข้อมูล Wallet
-  echo -e "${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
-  echo -e "${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
-  
-  # ส่วนการตั้งค่าการขุด
-  echo -e "${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
-  echo -e "${YELLOW} Threads:${CYAN} $THREADS${NC}"
-  echo -e "${YELLOW} Retry Pause:${BLUE} $RETRY_PAUSE seconds${NC}"
-   
-  jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
+jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
     POOL_NAME=$(echo "$pool" | jq -r '.name')
     POOL_URL=$(echo "$pool" | jq -r '.url')
     POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
@@ -51,10 +42,43 @@ function show_miner_info() {
     echo -e " ${YELLOW}$POOL_NAME${NC}"
     echo -e "   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
     echo -e "   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
+  
+  # ส่วนการตั้งค่าการขุด
+  echo -e "${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
+  echo -e "${YELLOW} Threads:${CYAN} $THREADS${NC}"
+  echo -e "${YELLOW} Retry Pause:${BLUE} $RETRY_PAUSE seconds${NC}"
+   # ส่วนข้อมูล Wallet
+  echo -e "${YELLOW} Wallet :${GREEN} $WALLET_ADDRESS${NC}"
+  echo -e "${YELLOW} Name miner:${BLUE} $WORKER_NAME${NC}"
    
-    echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            "
+  
+   
+    echo -e "${CYAN}            🚀 VRSC MINER CONFIGURATION            ${NC}"
   done
   }
+
+  while read -r line; do
+    # กรองและประมวลผลแต่ละบรรทัด
+    if [[ $line == *"Accepted"* ]]; then
+      ((accepted++))
+      last_share=$(date "+%Y-%m-%d %H:%M:%S")
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"Rejected"* ]]; then
+      ((rejected++))
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"Hashrate"* ]]; then
+      hashrate=$(echo "$line" | grep -oE "[0-9]+\.[0-9]+")
+      show_realtime_stats "$hashrate" "$accepted" "$rejected" "$(( ( $(date +%s) - start_time ) / 60 )" "$last_share"
+    elif [[ $line == *"New job"* ]]; then
+      pool_url=$(echo "$line" | grep -oE "stratum[^ ]+")
+      show_pool_info "Current Pool" "$pool_url" "${GREEN}ACTIVE${NC}"
+    elif [[ $line == *"error"* || $line == *"failed"* ]]; then
+      show_system_message "$line" "error"
+    elif [[ $line == *"warning"* ]]; then
+      show_system_message "$line" "warning"
+    fi
+  done
+}
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
 
