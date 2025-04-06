@@ -43,8 +43,8 @@ jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; d
     echo -e "   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
     echo -e "   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
 # ส่วนข้อมูล Wallet
-  echo -e "${YELLOW} Wallet :${GREEN} $WALLET_ADDRESS${NC}"
-  echo -e "${YELLOW} Name miner:${BLUE} $WORKER_NAME${NC}"
+  echo -e "${YELLOW} WALLET_ADDRESS:${GREEN} $WALLET_ADDRESS${NC}"
+  echo -e "${YELLOW}WORKER_NAME:${BLUE} $WORKER_NAME${NC}"
 
   # ส่วนการตั้งค่าการขุด
   echo -e "${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
