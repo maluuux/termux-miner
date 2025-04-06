@@ -27,7 +27,7 @@ function show_miner_info() {
   # อ่านข้อมูลหลัก
   ALGO=$(jq -r '.algo' "$CONFIG_FILE")
   RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
-  WALLE=${PURPLE}$(echo "$FULL_USER" | cut -d'.' -f1)
+  WALLET_ADDRESS=${PURPLE}$(echo "$FULL_USER" | cut -d'.' -f1)
   WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
   THREADS=$(jq -r '.threads' "$CONFIG_FILE")
 
