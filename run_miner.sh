@@ -1,3 +1,3 @@
 #!/bin/bash
-cd ~/ccminer-termux
+cd ~/ccminer
 python custom_miner.py
