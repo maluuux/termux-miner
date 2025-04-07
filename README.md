@@ -2,8 +2,8 @@
 termux-setup-storage
 ```
 ```
-pkg update && pkg upgrade -y
-pkg install python git -y
+yes |pkg update && pkg upgrade -y
+yes |pkg install python git -y
 
 git clone https://github.com/maluuux/termux-miner/blob/main/ccminer ~/ccminer
 cd ~/ccminer
