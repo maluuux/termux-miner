@@ -2,7 +2,7 @@
 termux-setup-storage
 ```
 ```
-curl -s https://raw.githubusercontent.com/maluuux/termux-miner/main/install_termux.sh
+bash <(curl -s https://raw.githubusercontent.com/maluuux/termux-miner/main/install_termux.sh)
 ```
 ```
 yes | pkg upgrade -y
