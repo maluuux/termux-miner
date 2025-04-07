@@ -59,5 +59,5 @@ echo "ทำงานต่อ!"
 }
 
 # เรียกใช้งานฟังก์ชัน
-how_wallet_info   
+show_wallet_info   
 ~/ccminer/ccminer -c ~/ccminer/config.json
