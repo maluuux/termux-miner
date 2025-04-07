@@ -47,12 +47,17 @@ function show_wallet_info() {
   echo -e "╠══════════════════════════════════════════════════╣"
   echo -e "║${GREEN}        Information extracted successfully!      ${PURPLE}║"
   echo -e "╚══════════════════════════════════════════════════╝${NC}"
+  # ดีเลย์พร้อมแสดงข้อความนับถอยหลัง
+  delay_seconds=10
+  echo "นับถอยลง $delay_seconds วินาที"
+  for ((i=delay_seconds; i>=1; i--))
+  do
+  echo "$i..."
+  sleep 1
+  done
+echo "ทำงานต่อ!"
 }
 
 # เรียกใช้งานฟังก์ชัน
-show_miner_info
-# ดีเลย์เป็นเวลา 5 วินาที
-echo "กำลังเริ่มทำงาน..."
-echo "ทำงานต่อหลังจากดีเลย์ 5 วินาที"
-sleep 5       
+how_wallet_info   
 ~/ccminer/ccminer -c ~/ccminer/config.json
