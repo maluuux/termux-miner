@@ -9,8 +9,9 @@ BLUE='\033[1;34m'
 PURPLE='\033[1;35m'
 NC='\033[0m'
 
-# ฟังก์ชันแสดงข้อมูลทั้งหมด
-function show_miner_info() {
+# ฟังก์ชันแสดงข้อมูล config
+function show_config() {
+  # อ่านค่าจาก config.json
   CONFIG_FILE="config.json"
   
   # ตรวจสอบไฟล์ config
@@ -26,78 +27,52 @@ function show_miner_info() {
   fi
 
   # อ่านข้อมูลหลัก
-  FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
-  WALLET_ADDRESS=$(echo "$FULL_USER" | cut -d'.' -f1)
-  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
+  USER=$(jq -r '.user' "$CONFIG_FILE")
   ALGO=$(jq -r '.algo' "$CONFIG_FILE")
   THREADS=$(jq -r '.threads' "$CONFIG_FILE")
   RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
+  API_ALLOW=$(jq -r '."api-allow"' "$CONFIG_FILE")
+  API_BIND=$(jq -r '."api-bind"' "$CONFIG_FILE")
 
   # แสดงผล
   clear
   echo -e "${PURPLE}╔══════════════════════════════════════════════════╗"
-  echo -e "║${CYAN}            🚀 VRSC MINER CONFIGURATION            ${PURPLE}║"
+  echo -e "║${CYAN}            ⚡ VRSC MINER CONFIGURATION            ${PURPLE}║"
   echo -e "╠══════════════════════════════════════════════════╣"
-  
-  # ส่วนข้อมูล Wallet
-  echo -e "║${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
-  echo -e "║${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
-  
-  # ส่วนการตั้งค่าการขุด
+  echo -e "║${YELLOW} User:${GREEN} $USER"
+  echo -e "║${YELLOW} Algorithm:${GREEN} $ALGO"
+  echo -e "║${YELLOW} Threads:${GREEN} $THREADS"
+  echo -e "║${YELLOW} Retry Pause:${GREEN} $RETRY_PAUSE seconds"
+  echo -e "║${YELLOW} API Access:${GREEN} $API_ALLOW"
+  echo -e "║${YELLOW} API Bind:${GREEN} $API_BIND"
   echo -e "╠══════════════════════════════════════════════════╣"
-  echo -e "║${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
-  echo -e "║${YELLOW} Threads:${CYAN} $THREADS${NC}"
-  echo -e "║${YELLOW} Retry Pause:${BLUE} $RETRY_PAUSE seconds${NC}"
-  
-  # ส่วน Pools
+  echo -e "║${CYAN}               AVAILABLE POOLS                ${PURPLE}║"
   echo -e "╠══════════════════════════════════════════════════╣"
-  echo -e "║${CYAN}               ACTIVE MINING POOLS               ${PURPLE}║"
-  echo -e "╠══════════════════════════════════════════════════╣"
-  
-  jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
-    POOL_NAME=$(echo "$pool" | jq -r '.name')
-    POOL_URL=$(echo "$pool" | jq -r '.url')
-    POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
+
+  # แสดง pools
+  jq -c '.pools[]' "$CONFIG_FILE" | while read -r pool; do
+    NAME=$(echo "$pool" | jq -r '.name')
+    URL=$(echo "$pool" | jq -r '.url')
+    TIMEOUT=$(echo "$pool" | jq -r '.timeout')
+    DISABLED=$(echo "$pool" | jq -r '.disabled')
     
-    echo -e "║ ${YELLOW}$POOL_NAME${NC}"
-    echo -e "║   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
-    echo -e "║   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
+    if [ "$DISABLED" = "0" ]; then
+      STATUS="${GREEN}ACTIVE${NC}"
+    else
+      STATUS="${RED}DISABLED${NC}"
+    fi
+    
+    echo -e "║ ${YELLOW}$NAME${NC}"
+    echo -e "║   URL: ${CYAN}$URL${NC}"
+    echo -e "║   Timeout: ${BLUE}$TIMEOUT${NC} seconds"
+    echo -e "║   Status: $STATUS"
     echo -e "╠══════════════════════════════════════════════════╣"
   done
-
-  # ส่วน Pools ที่ปิดการใช้งาน
-  DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
-  if [ "$DISABLED_COUNT" -gt 0 ]; then
-    echo -e "║${RED}          DISABLED POOLS ($DISABLED_COUNT)           ${PURPLE}║"
-    echo -e "╠══════════════════════════════════════════════════╣"
-    
-    jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
-      POOL_NAME=$(echo "$pool" | jq -r '.name')
-      echo -e "║ ${RED}$POOL_NAME${NC}"
-    done
-    
-    echo -e "╠══════════════════════════════════════════════════╣"
-  fi
 
   echo -e "║${GREEN}        Config loaded successfully!         ${PURPLE}║"
   echo -e "╚══════════════════════════════════════════════════╝${NC}"
 }
 
-# ดีเลย์เป็นเวลา 5 วินาที
-echo "กำลังเริ่มทำงาน..."
-sleep 5
-echo "ทำงานต่อหลังจากดีเลย์ 5 วินาที"
-
-# ดีเลย์พร้อมแสดงข้อความนับถอยหลัง
-delay_seconds=10
-echo "นับถอยลง $delay_seconds วินาที"
-for ((i=delay_seconds; i>=1; i--))
-do
-  echo "$i..."
-  sleep 1
-done
-echo "ทำงานต่อ!"
-
 # เรียกใช้งานฟังก์ชัน
-show_miner_info
+show_config
 ~/ccminer/ccminer -c ~/ccminer/config.json
