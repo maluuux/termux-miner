@@ -12,7 +12,7 @@ chmod +x ccminer custom_miner.py
 
 echo "🛠️ สร้างไฟล์ config (แก้ไขข้อมูลก่อนใช้)"
 if [ ! -f "config.json" ]; then
-    cp config_example.json config.json
+    cp config.json config.json
     echo "โปรดแก้ไขไฟล์ config.json ด้วยข้อมูลของคุณ!"
 fi
 
