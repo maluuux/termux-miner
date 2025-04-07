@@ -48,8 +48,8 @@ function show_simple_miner_info() {
   echo " ██║ ╚═╝ ██║██║██║ ╚████║███████╗██║  ██║"
   echo " ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
   echo -e "${NC}"
-  echo " V e r u s    M i n e r
-  echo -e "${NC}"
+  echo -e ""
+  echo " V e r u s    M i n e r"
   echo -e ""
   
   # ส่วนข้อมูล Wallet และ Worker แยกกันชัดเจน
