@@ -2,12 +2,11 @@
 pkg update -y && pkg upgrade -y
 pkg install -y python git libuv openssl hwloc
 
-wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
-wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
-wget  https://raw.githubusercontent.com/maluuux/termux-miner/custom_miner.py
-wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/run_miner.sh
+echo "📥 ดาวน์โหลด ccminer"
+git clone https://github.com/[USER]/ccminer
+cd ccminer-termux
 
-chmod +x ccminer custom_miner.py run_miner.sh
+chmod +x ccminer custom_miner.py
 
 echo "🛠️ สร้างไฟล์ config (แก้ไขข้อมูลก่อนใช้)"
 if [ ! -f "config.json" ]; then
