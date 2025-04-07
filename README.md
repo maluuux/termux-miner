@@ -5,6 +5,7 @@ termux-setup-storage
 bash <(curl -s https://raw.githubusercontent.com/maluuux/termux-miner/main/install_termux.sh)
 ```
 ```
+termux-setup-storage
 yes | pkg upgrade -y
 yes | pkg upgrade -y
 yes | pkg install libjansson wget nano -y
