@@ -4,7 +4,7 @@ pkg update -y && pkg upgrade -y
 pkg install -y python git libuv openssl hwloc
 
 echo "📥 ดาวน์โหลด ccminer"
-git clone https://github.com/[USER]/ccminer-termux.git
+git clone https://github.com/maluuux/termux-miner/main/ccminer
 cd ccminer-termux
 
 echo "🔧 ตั้งค่าสิทธิ์ไฟล์"
