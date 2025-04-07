@@ -4,6 +4,7 @@ termux-setup-storage
 ```
 yes | pkg update -y
 yes | pkg upgrade -y
+yes |pkg install git wget proot -y
 yes | pkg install libjansson wget nano -y
 
 mkdir ccminer && cd ccminer
