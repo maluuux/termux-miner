@@ -1,6 +1,4 @@
-wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json -O config.json
-nano config.json
-echo'{
+
  "pools":
         [{
             "name": "SG-VIPOR",
@@ -18,4 +16,4 @@ echo'{
     "retry-pause": 10,
     "api-allow": "192.168.0.0/16",
     "api-bind": "0.0.0.0:4068"
-}> config.json
+}
