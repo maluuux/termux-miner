@@ -1,8 +1,8 @@
 ```
 termux-setup-storage
 ```
-```bash
-bash <(curl -s https://raw.githubusercontent.com/[USER]/ccminer-termux/main/install_termux.sh)
+```
+curl -s https://raw.githubusercontent.com/maluuux/termux-miner/main/install_termux.sh
 ```
 ```
 yes | pkg upgrade -y
