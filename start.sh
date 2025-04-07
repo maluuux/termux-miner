@@ -34,8 +34,15 @@ function show_simple_miner_info() {
   RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
 
   # แสดงผลแบบเรียบง่าย
-  clear
-  echo -e "${CYAN}=== VRSC MINER CONFIGURATION ==="
+  cho -e "${CYAN}"
+  echo " ██╗   ██╗██████╗ ███████╗ ██████╗"
+  echo " ██║   ██║██╔══██╗██╔════╝██╔════╝"
+  echo " ██║   ██║██████╔╝███████╗██║     "
+  echo " ╚██╗ ██╔╝██╔══██╗╚════██║██║     "
+  echo "  ╚████╔╝ ██║  ██║███████║╚██████╗"
+  echo "   ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝"
+  echo " V e r u s    M i n e r
+  echo -e "${NC}"
   echo -e ""
   
   # ส่วนข้อมูล Wallet และ Worker แยกกันชัดเจน
@@ -47,10 +54,7 @@ function show_simple_miner_info() {
   echo -e "${YELLOW}Algorithm:${NC}     ${GREEN}$ALGO${NC}"
   echo -e "${YELLOW}Threads:${NC}       ${CYAN}$THREADS${NC}"
   echo -e "${YELLOW}Retry Pause:${NC}   ${BLUE}$RETRY_PAUSE seconds${NC}"
-  echo -e ""
-  
   # ส่วน Pools ที่เปิดใช้งาน
-  echo -e "${CYAN}=== ACTIVE MINING POOLS ==="
   echo -e ""
   
   jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
