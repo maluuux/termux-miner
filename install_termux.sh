@@ -8,7 +8,7 @@ wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/custom_miner.py
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/staer.sh
 
-chmod +x ccminer custom_miner.py &&./run_miner.sh
+chmod +x ccminer custom_miner.py
 
 echo "🛠️ สร้างไฟล์ config (แก้ไขข้อมูลก่อนใช้)"
 if [ ! -f "config.json" ]; then
