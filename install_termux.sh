@@ -1,5 +1,5 @@
 #!/bin/bash
-pkg update -y && pkg upgrade -y
+pkg update -y && pkg upgrade -y && pkg install libjansson wget nano -y
 pkg install -y python git libuv openssl hwloc
 
 mkdir ccminer && cd ccminer
