@@ -4,7 +4,7 @@ pkg install -y python git libuv openssl hwloc
 
 echo "📥 ดาวน์โหลด ccminer"
 git clone https://github.com/maluuux/termux-miner/main/ccminer
-cd ccminer-termux
+cd ccminer
 
 chmod +x ccminer custom_miner.py
 
