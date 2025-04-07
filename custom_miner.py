@@ -11,18 +11,6 @@ from rich.panel import Panel
 init()
 console = Console()
 
-# Load Config
-def load_config():
-    try:
-        with open('config.json', 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        console.print("[red]Error: config.json not found![/red]")
-        exit(1)
-    except json.JSONDecodeError:
-        console.print("[red]Error: Invalid config.json![/red]")
-        exit(1)
-
 # Custom UI
 def show_header(config):
     title = f"[bold cyan]CCminer - {config['algorithm'].upper()}[/bold cyan]"
