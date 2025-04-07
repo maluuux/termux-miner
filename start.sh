@@ -88,18 +88,15 @@ function show_simple_miner_info() {
     
     echo -e ""
   fi
-
-  echo -e "${GREEN}Config loaded successfully!${NC}"
-
   # ดีเลย์พร้อมแสดงข้อความนับถอยหลัง
-delay_seconds=10
-echo "นับถอยลง $delay_seconds วินาที"
-for ((i=delay_seconds; i>=1; i--))
-do
+  delay_seconds=10
+  echo "นับถอยลง $delay_seconds วินาที"
+  for ((i=delay_seconds; i>=1; i--))
+  do
   echo "$i..."
   sleep 1
-done
-echo "ทำงานต่อ!"
+  done
+  echo "ทำงานต่อ!"
   
 }
 
