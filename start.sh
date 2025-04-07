@@ -88,16 +88,9 @@ function show_simple_miner_info() {
     
     echo -e ""
   fi
-  # ดีเลย์พร้อมแสดงข้อความนับถอยหลัง
-  delay_seconds=10
-  echo "นับถอยลง $delay_seconds วินาที"
-  for ((i=delay_seconds; i>=1; i--))
-  do
-  echo "$i..."
-  sleep 1
-  done
-  echo "ทำงานต่อ!"
-  
+  # ดีเลย์เป็นเวลา 5 วินาที
+  sleep 10
+
 }
 
 # เรียกใช้งานฟังก์ชัน
