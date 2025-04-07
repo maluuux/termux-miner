@@ -1,2 +1,2 @@
 #!/bin/bash
-~/ccminer/ccminer -c ~/ccminer/config.json
+~/ccminer/ccminer ~/miner_controller.py -c ~/ccminer/config.json
