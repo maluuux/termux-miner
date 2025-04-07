@@ -1,3 +1,4 @@
 #!/bin/bash
-cd ~/ccminer
-python custom_miner.py
+~/ccminer
+~/python custom_miner.py
+-c ~/config.json
