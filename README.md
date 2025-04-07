@@ -6,12 +6,8 @@ yes | pkg install termux-api -y
 yes | pkg upgrade -y
 yes | pkg upgrade -y
 yes | pkg install python git make clang -y
-pip install rich psutil
-
-yes | pkg update -y
-
 yes | pkg install libjansson wget nano -y
-
+pip install rich psutil
 
 mkdir ccminer && cd ccminer
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
