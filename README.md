@@ -10,6 +10,6 @@ pkg install python libuv openssl hwloc -y
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/custom_miner.py
-      chmod +x ccminer custom_miner.py
-python custom_miner.py
+wget  https://raw.githubusercontent.com/maluuux/termux-miner/run_miner.sh
+      chmod +x ccminer run_miner.sh && python custom_miner.py
 ```
