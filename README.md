@@ -9,5 +9,5 @@ git clone https://github.com/yourusername/ccminer.git
       cd ccminer
 wget https://raw.githubusercontent.com/yourusername/yourrepo/main/custom_display.py -O custom_display.py
 
-      chmod +x ccminer run_miner.sh && python custom_miner.py
+      chmod +x start_miner.sh
 ```
