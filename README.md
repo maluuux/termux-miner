@@ -2,12 +2,13 @@
 termux-setup-storage
 ```
 ```
-yes | pkg update -y && pkg upgrade -y
-yes | pkg install git wget curl python make clang libuv-dev openssl-dev -y
+pkg update && pkg upgrade -y
+pkg install python git -y
+pip install --upgrade pip
 
-git clone https://github.com/yourusername/ccminer.git
-      cd ccminer
-wget https://raw.githubusercontent.com/yourusername/yourrepo/main/custom_display.py -O custom_display.py
+git clone https://github.com/maluuux/termux-miner/blob/main/ccminer ~/ccminer
+cd ~/ccminer
+chmod +x ccminer
 
-      chmod +x start_miner.sh
+
 ```
