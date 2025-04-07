@@ -14,5 +14,5 @@ wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/miner_controller.py
 wget  https://raw.githubusercontent.com/maluuux/termux-miner/main/staer.sh
-      chmod +x ccminer staer.sh miner_controller.py && ./start.sh
+      chmod +x ccminer start.sh miner_controller.py && ./start.sh
 ```
