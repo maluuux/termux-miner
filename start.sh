@@ -1,84 +1,94 @@
 #!/bin/bash
-# สีสำหรับ UI
+
+# สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[1;34m'
-MAGENTA='\033[1;35m'
 CYAN='\033[1;36m'
-NC='\033[0m' # No Color
+BLUE='\033[1;34m'
+PURPLE='\033[1;35m'
+NC='\033[0m'
 
-# ฟังก์ชันแสดง UI ส่วนหัว
-function show_header() {
+# ฟังก์ชันแสดงข้อมูลทั้งหมด
+function show_miner_info() {
+  CONFIG_FILE="config.json"
+  
+  # ตรวจสอบไฟล์ config
+  if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${RED}Error: config.json not found!${NC}"
+    exit 1
+  fi
+
+  # ตรวจสอบ jq
+  if ! command -v jq &> /dev/null; then
+    echo -e "${YELLOW}Installing jq...${NC}"
+    pkg install -y jq > /dev/null 2>&1
+  fi
+
+  # อ่านข้อมูลหลัก
+  FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
+  WALLET_ADDRESS=$(echo "$FULL_USER" | cut -d'.' -f1)
+  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
+  ALGO=$(jq -r '.algo' "$CONFIG_FILE")
+  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
+  RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
+
+  # แสดงผล
   clear
-  echo -e "${CYAN}"
-  echo " ██╗   ██╗██████╗ ███████╗ ██████╗"
-  echo " ██║   ██║██╔══██╗██╔════╝██╔════╝"
-  echo " ██║   ██║██████╔╝███████╗██║     "
-  echo " ╚██╗ ██╔╝██╔══██╗╚════██║██║     "
-  echo "  ╚████╔╝ ██║  ██║███████║╚██████╗"
-  echo "   ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝"
-  echo -e "${NC}"
-  echo -e "${MAGENTA}=== VRSC Auto Miner ===${NC}"
-  echo -e "${YELLOW}Version: 2.1 Auto Mode${NC}"
-  echo ""
+  echo -e "${PURPLE}╔══════════════════════════════════════════════════╗"
+  echo -e "║${CYAN}            🚀 VRSC MINER CONFIGURATION            ${PURPLE}║"
+  echo -e "╠══════════════════════════════════════════════════╣"
+  
+  # ส่วนข้อมูล Wallet
+  echo -e "║${YELLOW} Wallet Address:${GREEN} $WALLET_ADDRESS${NC}"
+  echo -e "║${YELLOW} Worker Name:${BLUE} $WORKER_NAME${NC}"
+  
+  # ส่วนการตั้งค่าการขุด
+  echo -e "╠══════════════════════════════════════════════════╣"
+  echo -e "║${YELLOW} Algorithm:${GREEN} $ALGO${NC}"
+  echo -e "║${YELLOW} Threads:${CYAN} $THREADS${NC}"
+  echo -e "║${YELLOW} Retry Pause:${BLUE} $RETRY_PAUSE seconds${NC}"
+  
+  # ส่วน Pools
+  echo -e "╠══════════════════════════════════════════════════╣"
+  echo -e "║${CYAN}               ACTIVE MINING POOLS               ${PURPLE}║"
+  echo -e "╠══════════════════════════════════════════════════╣"
+  
+  jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
+    POOL_NAME=$(echo "$pool" | jq -r '.name')
+    POOL_URL=$(echo "$pool" | jq -r '.url')
+    POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
+    
+    echo -e "║ ${YELLOW}$POOL_NAME${NC}"
+    echo -e "║   ${CYAN}URL:${GREEN} $POOL_URL${NC}"
+    echo -e "║   ${BLUE}Timeout:${GREEN} $POOL_TIMEOUT seconds${NC}"
+    echo -e "╠══════════════════════════════════════════════════╣"
+  done
+
+  # ส่วน Pools ที่ปิดการใช้งาน
+  DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
+  if [ "$DISABLED_COUNT" -gt 0 ]; then
+    echo -e "║${RED}          DISABLED POOLS ($DISABLED_COUNT)           ${PURPLE}║"
+    echo -e "╠══════════════════════════════════════════════════╣"
+    
+    jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
+      POOL_NAME=$(echo "$pool" | jq -r '.name')
+      echo -e "║ ${RED}$POOL_NAME${NC}"
+    done
+    
+    echo -e "╠══════════════════════════════════════════════════╣"
+  fi
+
+  echo -e "║${GREEN}        Config loaded successfully!         ${PURPLE}║"
+  echo -e "╚══════════════════════════════════════════════════╝${NC}"
 }
 
-# ตรวจสอบไฟล์ config
-if [ ! -f "config.json" ]; then
-  show_header
-  echo -e "${YELLOW}Creating default config file...${NC}"
-  cat > config.json <<EOF
-{
-  "pool": "stratum+tcp://eu.luckpool.net:3956",
-  "wallet": "YOUR_WALLET_ADDRESS_HERE",
-  "worker": "termux-$(date +%s | tail -c 4)",
-  "threads": 2
-}
-EOF
-  echo -e "${RED}Error: Please edit config.json with your VRSC wallet address!${NC}"
-  exit 1
-fi
+# เรียกใช้งานฟังก์ชัน
+show_miner_info
+# ดีเลย์เป็นเวลา 5 วินาที
+echo "กำลังเริ่มทำงาน..."
+echo "ทำงานต่อหลังจากดีเลย์ 5 วินาที"
+sleep 5
 
-# อ่านการตั้งค่า
-POOL=$(grep -oP '"pool":\s*"\K[^"]+' config.json)
-WALLET=$(grep -oP '"wallet":\s*"\K[^"]+' config.json)
-WORKER=$(grep -oP '"worker":\s*"\K[^"]+' config.json)
-THREADS=$(grep -oP '"threads":\s*\K[0-9]+' config.json)
-
-# ตรวจสอบ wallet address
-if [ "$WALLET" == "YOUR_WALLET_ADDRESS_HERE" ]; then
-  show_header
-  echo -e "${RED}Error: Please set your VRSC wallet address in config.json${NC}"
-  exit 1
-fi
-
-# ตรวจสอบไฟล์ miner
-if [ ! -f "ccminer" ]; then
-  show_header
-  echo -e "${RED}Error: Miner binary 'ccminer' not found!${NC}"
-  echo -e "Please make sure:"
-  echo -e "1. CCminer binary exists in this directory"
-  echo -e "2. The file is named 'ccminer'"
-  echo -e "3. It has execute permission (run: chmod +x ccminer)"
-  exit 1
-fi
-
-# แสดงข้อมูลการขุด
-show_header
-echo -e "${GREEN}=== Mining Starting ===${NC}"
-echo -e "${YELLOW}Pool: ${CYAN}$POOL${NC}"
-echo -e "${YELLOW}Wallet: ${CYAN}$WALLET${NC}"
-echo -e "${YELLOW}Worker: ${CYAN}$WORKER${NC}"
-echo -e "${YELLOW}Threads: ${CYAN}$THREADS${NC}"
-echo ""
-echo -e "${MAGENTA}Press ${RED}Ctrl+C ${MAGENTA}to stop mining${NC}"
-echo ""
-
-# เริ่มการขุด
-if config["auto-restart"]:
-    while True:
-        start_mining()
-        time.sleep(5)  # รอ 5 วินาทีก่อนรีสตาร์ท
         
 ~/ccminer/ccminer -c ~/ccminer/config.json
