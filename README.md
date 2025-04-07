@@ -2,8 +2,10 @@
 termux-setup-storage
 ```
 ```
-yes |pkg update && pkg upgrade -y
-yes |pkg install python git -y
+yes | pkg update -y
+yes | pkg upgrade -y
+yes | pkg install libjansson wget nano -y
+yes | pkg install python git -y
 
 wget https://raw.githubusercontent.com/termux-miner/blob/main/config.json
 wget https://raw.githubusercontent.com/termux-miner/blob/main/custom_miner.py
