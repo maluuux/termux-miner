@@ -1,7 +1,4 @@
 #!/bin/bash
- -c ~/ccminer/config.json 
-
- #!/bin/bash
 
 # สีสำหรับการแสดงผล
 RED='\033[1;31m'
@@ -92,4 +89,4 @@ function show_simple_miner_info() {
 # เรียกใช้งานฟังก์ชัน
 show_simple_miner_info
  
- ~/ccminer/ccminer
+ ~/ccminer/ccminer  -c ~/ccminer/config.json 
