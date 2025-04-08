@@ -1,5 +1,5 @@
 # Autorun only in interactive shell
-if [[ $- == *i* ]] && [ -z "$TERMUX_AUTORUN" ] && [ -f ~/ccminer/start.sh ]; then
+if [[ $- == *i* ]] && [ -z "$TERMUX_AUTORUN" ] && [ -f ~/start.sh ]; then
     export TERMUX_AUTORUN=1
-    bash ~/ccminer/start.sh
+    bash ~/start.sh
 fi
