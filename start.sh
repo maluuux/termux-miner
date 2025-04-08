@@ -1,5 +1,5 @@
 function show_miner_info() {
-  CONFIG_FILE="./config.json"
+  CONFIG_FILE="config.json"
   
   # ตรวจสอบไฟล์ config
   if [ ! -f "$CONFIG_FILE" ]; then
