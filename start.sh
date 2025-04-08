@@ -12,27 +12,38 @@ NC='\033[0m'
 # ฟังก์ชันแสดงข้อมูลทั้งหมดแบบเรียบง่าย
 function show_simple_miner_info() {
   CONFIG_FILE="config.json"
+# ตั้งค่า path ของ config file
+CONFIG_FILE="$HOME/config.json"
 
-  # ตรวจสอบไฟล์ config
-  if [ ! -f "$CONFIG_FILE" ]; then
+# ตรวจสอบไฟล์ config
+if [ ! -f "$CONFIG_FILE" ]; then
     echo -e "${RED}Error: config.json not found!${NC}"
+    echo -e "${YELLOW}Please create config.json in your home directory first.${NC}"
     exit 1
-  fi
+fi
 
-  # ตรวจสอบ jq
-  if ! command -v jq &> /dev/null; then
+# ตรวจสอบ jq
+if ! command -v jq &> /dev/null; then
     echo -e "${YELLOW}Installing jq...${NC}"
-    pkg install -y jq > /dev/null 2>&1
-  fi
+    pkg install -y jq > /dev/null 2>&1 || {
+        echo -e "${RED}Failed to install jq!${NC}"
+        exit 1
+    }
+fi
 
-  # อ่านข้อมูลหลัก
-  FULL_USER=$(jq -r '.user' "$CONFIG_FILE")
-  WALLET_ADDRESS=$(echo "$FULL_USER" | cut -d'.' -f1)
-  WORKER_NAME=$(echo "$FULL_USER" | cut -d'.' -f2-)
-  ALGO=$(jq -r '.algo' "$CONFIG_FILE")
-  THREADS=$(jq -r '.threads' "$CONFIG_FILE")
-  RETRY_PAUSE=$(jq -r '."retry-pause"' "$CONFIG_FILE")
+# อ่านค่าจาก config.json
+POOL_URL=$(jq -r '.pools[0].url' "$CONFIG_FILE")
+USER=$(jq -r '.user' "$CONFIG_FILE")
+PASS=$(jq -r '.pass' "$CONFIG_FILE")
+ALGO=$(jq -r '.algo' "$CONFIG_FILE")
+THREADS=$(jq -r '.threads' "$CONFIG_FILE")
 
+# ตรวจสอบค่าที่จำเป็น
+if [[ -z "$POOL_URL" || -z "$USER" || -z "$ALGO" ]]; then
+    echo -e "${RED}Invalid config: missing required fields!${NC}"
+    echo -e "${YELLOW}Required fields: pools[0].url, user, algo${NC}"
+    exit 1
+fi
   # แสดงผลแบบเรียบง่าย
   echo -e "${CYAN}"
   echo " ██╗   ██╗███████╗██████╗ ██╗   ██╗███████╗"
@@ -49,38 +60,12 @@ function show_simple_miner_info() {
   echo " ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
   echo -e "${NC}"
   echo -e ""
-  # ส่วนข้อมูล Walles 
-  echo -e "${YELLOW}Wallet Address:${NC} ${GREEN}$WALLET_ADDRESS${NC}"
-  echo -e "${YELLOW}Worker Name:${NC}    ${BLUE}$WORKER_NAME${NC}"
-
-  # ส่วนการตั้งค่าการขุด
-  echo -e "${YELLOW}Algorithm:${NC}     ${GREEN}$ALGO${NC}"
-  echo -e "${YELLOW}Threads:${NC}       ${CYAN}$THREADS${NC}"
-  echo -e "${YELLOW}Retry Pause:${NC}   ${BLUE}$RETRY_PAUSE seconds${NC}"
-  # ส่วน Pools ที่เปิดใช้งาน
-
-  jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
-    POOL_NAME=$(echo "$pool" | jq -r '.name')
-    POOL_URL=$(echo "$pool" | jq -r '.url')
-    POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
-
-    echo -e "${YELLOW}Pool Name:${NC}    ${GREEN}$POOL_NAME${NC}"
-    echo -e "${CYAN}URL:${NC}         ${BLUE}$POOL_URL${NC}"
-    echo -e "${BLUE}Timeout:${NC}     ${GREEN}$POOL_TIMEOUT seconds${NC}"
-  done
-
-  # ส่วน Pools ที่ปิดการใช้งาน
-  DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
-  if [ "$DISABLED_COUNT" -gt 0 ]; then
-    echo -e "${RED}=== DISABLED POOLS ($DISABLED_COUNT) ==="
-
-    jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
-      POOL_NAME=$(echo "$pool" | jq -r '.name')
-      echo -e "${RED}$POOL_NAME${NC}"
-    done
-
-    echo -e ""
-  fi
+  # แสดงข้อมูลการตั้งค่า
+ echo -e "${GREEN}=== Mining Configuration ==="
+ echo -e "Pool URL: ${POOL_URL}"
+ echo -e "User: ${USER}"
+ echo -e "Algorithm: ${ALGO}"
+ echo -e "Threads: ${THREADS:-auto}${NC}"
   # ดีเลย์เป็นเวลา 5 วินาที
   sleep 10
 
