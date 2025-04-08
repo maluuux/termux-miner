@@ -1,2 +1,4 @@
 #!/bin/bash
-~/ccminer/ccminer -c ~/ccminer/config.json
+ -c ~/ccminer/config.json 
+ ~/run-ui.sh
+ ~/ccminer/ccminer
