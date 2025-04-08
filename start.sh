@@ -1,5 +1,5 @@
 #!/bin/bash
- -c ~/config.json 
+ -c ~/ccminer/config.json 
 
  #!/bin/bash
 
