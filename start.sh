@@ -52,20 +52,15 @@ function show_simple_miner_info() {
   echo " ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
   echo -e "${NC}"
   echo -e ""
-  echo " V e r u s    M i n e r"
-  echo -e ""
-
-  # ส่วนข้อมูล Wallet และ Worker แยกกันชัดเจน
+  # ส่วนข้อมูล Walles 
   echo -e "${YELLOW}Wallet Address:${NC} ${GREEN}$WALLET_ADDRESS${NC}"
   echo -e "${YELLOW}Worker Name:${NC}    ${BLUE}$WORKER_NAME${NC}"
-  echo -e ""
 
   # ส่วนการตั้งค่าการขุด
   echo -e "${YELLOW}Algorithm:${NC}     ${GREEN}$ALGO${NC}"
   echo -e "${YELLOW}Threads:${NC}       ${CYAN}$THREADS${NC}"
   echo -e "${YELLOW}Retry Pause:${NC}   ${BLUE}$RETRY_PAUSE seconds${NC}"
   # ส่วน Pools ที่เปิดใช้งาน
-  echo -e ""
 
   jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
     POOL_NAME=$(echo "$pool" | jq -r '.name')
@@ -75,14 +70,12 @@ function show_simple_miner_info() {
     echo -e "${YELLOW}Pool Name:${NC}    ${GREEN}$POOL_NAME${NC}"
     echo -e "${CYAN}URL:${NC}         ${BLUE}$POOL_URL${NC}"
     echo -e "${BLUE}Timeout:${NC}     ${GREEN}$POOL_TIMEOUT seconds${NC}"
-    echo -e ""
   done
 
   # ส่วน Pools ที่ปิดการใช้งาน
   DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
   if [ "$DISABLED_COUNT" -gt 0 ]; then
     echo -e "${RED}=== DISABLED POOLS ($DISABLED_COUNT) ==="
-    echo -e ""
 
     jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
       POOL_NAME=$(echo "$pool" | jq -r '.name')
