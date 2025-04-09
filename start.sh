@@ -51,8 +51,8 @@ function show_miner_info() {
  echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
  echo -e "\033[0m"
  echo "/n"
-  echo -e "${YELLOW}Wallet Address: ${GREEN}$WALLET_ADDRESS"
-  echo -e "${YELLOW}Worker Name: ${RED}$WORKER_NAME"
+  echo -e "${YELLOW}💰Wallet Address: ${GREEN}$WALLET_ADDRESS"
+  echo -e "${YELLOW}⛏️Worker Name: ${RED}$WORKER_NAME"
   echo -e "${YELLOW}Algorithm: ${GREEN}$ALGO"
   echo -e "${YELLOW}Threads: ${CYAN}$THREADS"
   echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE"
@@ -71,7 +71,7 @@ function show_miner_info() {
 
 #!/bin/bash
 
-count=9
+count=10
 echo -n "$count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
 while [ $count -gt 0 ]; do
     sleep 1
