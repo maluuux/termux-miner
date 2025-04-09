@@ -34,12 +34,26 @@ function show_miner_info() {
 
   # แสดงผลแบบเรียบง่าย
   clear
-  echo -e "${CYAN}=== VRSC MINER CONFIGURATION ==="
+  echo -e "\033[0;36m"
+ echo "██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ "
+ echo "██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗"
+ echo "██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝"
+ echo "╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗"
+ echo " ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║"
+ echo "  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝"
+ echo "███╗   ███╗██╗███╗   ██╗███████╗██████╗ "
+ echo "████╗ ████║██║████╗  ██║██╔════╝██╔══██╗"
+ echo "██╔████╔██║██║██╔██╗ ██║█████╗  ██████╔╝"
+ echo "██║╚██╔╝██║██║██║╚██╗██║██╔══╝  ██╔══██╗"
+ echo "██║ ╚═╝ ██║██║██║ ╚████║███████╗██║  ██║"
+ echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
+ echo -e "\033[0m"
+ echo "seconds"
   echo -e "${YELLOW}Wallet Address: ${GREEN}$WALLET_ADDRESS"
   echo -e "${YELLOW}Worker Name: ${BLUE}$WORKER_NAME"
   echo -e "${YELLOW}Algorithm: ${GREEN}$ALGO"
   echo -e "${YELLOW}Threads: ${CYAN}$THREADS"
-  echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE seconds"
+  echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE"
   
   # แสดง Pools ที่ใช้งานอยู่
   echo -e "\n${CYAN}=== ACTIVE MINING POOLS ==="
@@ -50,21 +64,9 @@ function show_miner_info() {
     
     echo -e "${YELLOW}Pool: ${GREEN}$POOL_NAME"
     echo -e "  ${CYAN}URL: ${BLUE}$POOL_URL"
-    echo -e "  ${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT seconds"
+    echo -e "  ${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT"
   done
-
-  # แสดง Pools ที่ปิดการใช้งาน
-  DISABLED_COUNT=$(jq '[.pools[] | select(.disabled == 1)] | length' "$CONFIG_FILE")
-  if [ "$DISABLED_COUNT" -gt 0 ]; then
-    echo -e "\n${RED}=== DISABLED POOLS ($DISABLED_COUNT) ==="
-    jq -c '.pools[] | select(.disabled == 1)' "$CONFIG_FILE" | while read -r pool; do
-      echo -e "${RED}$(echo "$pool" | jq -r '.name')"
-    done
-  fi
-
-  echo -e "\n${GREEN}Config loaded successfully!${NC}"
 }
-
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
  
