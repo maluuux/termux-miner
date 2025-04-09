@@ -9,3 +9,5 @@ if [[ $- == *i* ]] && [[ -z "$TERMUX_AUTORUN" ]]; then
         disown
     fi
 fi
+alias run='~/ccminer/start.sh'
+alias edit='nano config.json'
