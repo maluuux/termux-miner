@@ -50,7 +50,7 @@ function show_miner_info() {
  echo -e "\033[0m"
  echo "/n"
   echo -e "${YELLOW}Wallet Address: ${GREEN}$WALLET_ADDRESS"
-  echo -e "${YELLOW}Worker Name: ${BLUE}$WORKER_NAME"
+  echo -e "${YELLOW}Worker Name: ${RED}$WORKER_NAME"
   echo -e "${YELLOW}Algorithm: ${GREEN}$ALGO"
   echo -e "${YELLOW}Threads: ${CYAN}$THREADS"
   echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE"
@@ -69,14 +69,14 @@ function show_miner_info() {
 
 #!/bin/bash
 
-count=10
-echo -n "นับถอยหลัง: $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
+count=9
+echo -n "โปรแกรมจะเริ่มใน: $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
 while [ $count -gt 0 ]; do
     sleep 1
     count=$((count - 1))
     echo -ne "\rนับถอยหลัง: $count"  # \r เพื่อลบบรรทัดเดิม
 done
-echo -e "\nเสร็จสิ้น!"
+echo -e "\nเริ่มโปรแกรม!"
 }
 
 # เรียกใช้งานฟังก์ชัน
