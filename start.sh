@@ -66,7 +66,18 @@ function show_miner_info() {
     echo -e "  ${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT"
     echo -e "\033[0m"
   done
+#!/bin/bash
+
+count=10
+echo -n "โปรแกรม SEART: $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
+while [ $count -gt 0 ]; do
+    sleep 1
+    count=$((count - 1))
+    echo -ne "\rนับถอยหลัง: $count"  # \r เพื่อลบบรรทัดเดิม
+done
+echo -e "\nSTAER!"
 }
+
 # เรียกใช้งานฟังก์ชัน
 show_miner_info
  
