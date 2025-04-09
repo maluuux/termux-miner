@@ -1,7 +1,7 @@
 #!/bin/bash
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
-wget https://raw.githubusercontent.com/maluuux/termux-miner/main/start.sh
+
 #สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
