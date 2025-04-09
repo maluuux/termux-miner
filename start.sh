@@ -1,5 +1,5 @@
 #!/bin/bash
--c ~/ccminer/config.json 
+wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 #สีสำหรับการแสดงผล
 RED='\033[1;31m'
 GREEN='\033[1;32m'
