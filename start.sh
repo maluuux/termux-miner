@@ -72,11 +72,11 @@ function show_miner_info() {
 #!/bin/bash
 
 count=9
-echo -n "โปรแกรมจะเริ่มใน: $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
+echo -n "$count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
 while [ $count -gt 0 ]; do
     sleep 1
     count=$((count - 1))
-    echo -ne "\rนับถอยหลัง: $count"  # \r เพื่อลบบรรทัดเดิม
+    echo -ne "\rโปรแกรมจะเริ่มใน: $count"  # \r เพื่อลบบรรทัดเดิม
 done
 echo -e "\nเริ่มโปรแกรม!"
 }
