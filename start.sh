@@ -68,7 +68,7 @@ function show_miner_info() {
   done
 
 count=10
-echo -n "โปรแกรมจะเริ่มใน - : $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
+echo -n $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
 while [ $count -gt 0 ]; do
     sleep 1
     count=$((count - 1))
