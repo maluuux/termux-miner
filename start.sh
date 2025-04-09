@@ -48,15 +48,14 @@ function show_miner_info() {
  echo "██║ ╚═╝ ██║██║██║ ╚████║███████╗██║  ██║"
  echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
  echo -e "\033[0m"
- echo "seconds"
+ echo "/n"
   echo -e "${YELLOW}Wallet Address: ${GREEN}$WALLET_ADDRESS"
   echo -e "${YELLOW}Worker Name: ${BLUE}$WORKER_NAME"
   echo -e "${YELLOW}Algorithm: ${GREEN}$ALGO"
   echo -e "${YELLOW}Threads: ${CYAN}$THREADS"
   echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE"
-  
   # แสดง Pools ที่ใช้งานอยู่
-  echo -e "\n${CYAN}=== ACTIVE MINING POOLS ==="
+  echo -e "${CYAN}=== ACTIVE MINING POOLS ==="
   jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
     POOL_NAME=$(echo "$pool" | jq -r '.name')
     POOL_URL=$(echo "$pool" | jq -r '.url')
@@ -65,6 +64,7 @@ function show_miner_info() {
     echo -e "${YELLOW}Pool: ${GREEN}$POOL_NAME"
     echo -e "  ${CYAN}URL: ${BLUE}$POOL_URL"
     echo -e "  ${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT"
+    echo -e "\033[0m"
   done
 }
 # เรียกใช้งานฟังก์ชัน
