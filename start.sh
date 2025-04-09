@@ -67,14 +67,16 @@ function show_miner_info() {
     echo -e "\033[0m"
   done
 
+#!/bin/bash
+
 count=10
-echo -n $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
+echo -n "นับถอยหลัง: $count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
 while [ $count -gt 0 ]; do
     sleep 1
     count=$((count - 1))
     echo -ne "\rนับถอยหลัง: $count"  # \r เพื่อลบบรรทัดเดิม
 done
-echo -e "\nเริ่มโปรแกรม!"
+echo -e "\nเสร็จสิ้น!"
 }
 
 # เรียกใช้งานฟังก์ชัน
