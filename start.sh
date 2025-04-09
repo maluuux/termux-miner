@@ -50,7 +50,7 @@ function show_miner_info() {
  echo "██║ ╚═╝ ██║██║██║ ╚████║███████╗██║  ██║"
  echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
  echo -e "\033[0m"
- echo "/n"
+ echo ""
   echo -e "${YELLOW} เลขกระเป๋า: ${GREEN}$WALLET_ADDRESS"
   echo -e "${YELLOW} ชื่อ miner: ${RED}$WORKER_NAME"
   echo -e "${YELLOW} อัลกอริทึม: ${GREEN}$ALGO"
