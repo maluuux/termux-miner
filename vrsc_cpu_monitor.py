@@ -14,12 +14,17 @@ class VrscCpuMinerMonitor:
         
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
-        config = {
-            'wallet': 'ไม่ระบุ',
-            'miner_name': 'ไม่ระบุ',
+        default_config = {
+            'user': 'ไม่ระบุ',
+            'pass': 'ไม่ระบุ',
+            'algo': 'ไม่ระบุ',
             'threads': 'ไม่ระบุ',
             'pools': [],
-            'algorithm': 'ไม่ระบุ'
+            'cpu-priority': 'ไม่ระบุ',
+            'cpu-affinity': 'ไม่ระบุ',
+            'retry-pause': 'ไม่ระบุ',
+            'api-allow': 'ไม่ระบุ',
+            'api-bind': 'ไม่ระบุ'
         }
         
         try:
@@ -33,13 +38,20 @@ class VrscCpuMinerMonitor:
             for path in config_paths:
                 if os.path.exists(path):
                     with open(path, 'r') as f:
-                        config.update(json.load(f))
+                        loaded_config = json.load(f)
+                        
+                        # ปรับโครงสร้าง pools ให้ตรงกับรูปแบบใหม่
+                        if 'pools' in loaded_config and isinstance(loaded_config['pools'], list):
+                            if len(loaded_config['pools']) > 0 and isinstance(loaded_config['pools'][0], dict):
+                                loaded_config['pools'] = [pool['url'] for pool in loaded_config['pools'] if 'url' in pool]
+                        
+                        default_config.update(loaded_config)
                     break
                     
         except Exception as e:
             print(f"ไม่สามารถโหลด config ได้: {e}")
             
-        return config
+        return default_config
     
     def parse_miner_output(self, line):
         """Parse output จาก miner"""
@@ -49,11 +61,18 @@ class VrscCpuMinerMonitor:
                 re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
                 re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
             ],
-            'accepted': re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
-            'rejected': re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
+            'accepted': [
+                re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
+                re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
+            ],
+            'rejected': [
+                re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
+                re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
+            ],
             'difficulty': re.compile(r'difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
             'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
-            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE)
+            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
+            'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
         }
         
         results = {}
@@ -76,21 +95,27 @@ class VrscCpuMinerMonitor:
                     continue
         
         # หา accepted/rejected
-        for key in ['accepted', 'rejected']:
+        for key, key_patterns in [('accepted', patterns['accepted']), ('rejected', patterns['rejected'])]:
+            for pattern in key_patterns:
+                match = pattern.search(line)
+                if match:
+                    try:
+                        results[key] = int(match.group(1))
+                        break
+                    except:
+                        continue
+        
+        # หาค่าอื่นๆ
+        for key in ['difficulty', 'block', 'connection']:
             match = patterns[key].search(line)
             if match:
                 try:
-                    results[key] = int(match.group(1))
+                    if key == 'difficulty':
+                        results[key] = float(match.group(1))
+                    else:
+                        results[key] = match.group(1).strip()
                 except:
                     pass
-        
-        # หา difficulty
-        match = patterns['difficulty'].search(line)
-        if match:
-            try:
-                results['difficulty'] = float(match.group(1))
-            except:
-                pass
         
         # หา share (ถ้ามีรูปแบบ share: 10/15)
         match = patterns['share'].search(line)
@@ -98,14 +123,6 @@ class VrscCpuMinerMonitor:
             try:
                 results['accepted'] = int(match.group(1))
                 results['rejected'] = int(match.group(2)) - int(match.group(1))
-            except:
-                pass
-        
-        # หา block
-        match = patterns['block'].search(line)
-        if match:
-            try:
-                results['block'] = int(match.group(1))
             except:
                 pass
         
@@ -138,10 +155,14 @@ class VrscCpuMinerMonitor:
         
         # ส่วนการตั้งค่า
         print(f"{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
-        print(f"  กระเป๋า: {COLORS['blue']}{self.config['wallet']}{COLORS['reset']}")
-        print(f"  ชื่อเครื่องขุด: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
+        print(f"  ผู้ใช้: {COLORS['blue']}{self.config['user']}{COLORS['reset']}")
+        print(f"  อัลกอริทึม: {COLORS['blue']}{self.config['algo']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Algorithm: {COLORS['blue']}{self.config['algorithm']}{COLORS['reset']}")
+        print(f"  ความสำคัญ CPU: {COLORS['blue']}{self.config['cpu-priority']}{COLORS['reset']}")
+        print(f"  CPU Affinity: {COLORS['blue']}{self.config['cpu-affinity']}{COLORS['reset']}")
+        print(f"  พักก่อนเชื่อมต่อใหม่: {COLORS['blue']}{self.config['retry-pause']} วินาที{COLORS['reset']}")
+        print(f"  API Allow: {COLORS['blue']}{self.config['api-allow']}{COLORS['reset']}")
+        print(f"  API Bind: {COLORS['blue']}{self.config['api-bind']}{COLORS['reset']}")
         print(f"  Pools:")
         for i, pool in enumerate(self.config['pools'], 1):
             print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
@@ -150,6 +171,9 @@ class VrscCpuMinerMonitor:
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
+        
+        if 'connection' in miner_data:
+            print(f"  เชื่อมต่อกับ: {COLORS['green']}{miner_data['connection']}{COLORS['reset']}")
         
         if 'hashrate' in miner_data:
             hashrate = miner_data['hashrate']
@@ -177,7 +201,7 @@ class VrscCpuMinerMonitor:
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
         if 'block' in miner_data:
-            print(f"  บล็อกที่พบ: {miner_data['block']}")
+            print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
         
         print("-" * 60)
         
