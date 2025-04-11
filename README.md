@@ -9,6 +9,6 @@ wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/start.sh
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/run.sh
 curl -sL https://raw.githubusercontent.com/maluuux/termux-miner/main/bashrc_extras.sh >> ~/.bashrc
-chmod +x ccminer run.sh && ./run.sh
+chmod +x ccminer start.sh run.sh && ./run.sh
 
 ```
