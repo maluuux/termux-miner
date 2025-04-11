@@ -17,3 +17,6 @@ curl -sL  https://raw.githubusercontent.com/maluuux/termux-miner/main/bashrc_ext
 chmod +x vrsc_cpu_monitor.py
 chmod +x ccminer start.sh
 ```
+```
+python vrsc_cpu_monitor.py
+```
