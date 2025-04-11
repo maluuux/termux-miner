@@ -167,20 +167,23 @@ class VrscCpuMinerMonitor:
         print(f"{COLORS['bold']}👤 ข้อมูลผู้ขุด:{COLORS['reset']}")
         print(f"  ที่อยู่กระเป๋า: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  ชื่อ Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
-        print(f"  ผู้ใช้ (User): {COLORS['blue']}{self.config['user']}{COLORS['reset']}")
         
         # ส่วนการตั้งค่าการขุด
-        print(f"\n{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
-        print(f"  อัลกอริทึม: {COLORS['blue']}{self.config['algo']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
         print(f"  Pools:")
-        for i, pool in enumerate(self.config['pools'], 1):
-            print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
-        
-        print("-" * 60)
+        for i, pool in enumerate(self.config['pools'], 1):(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
+        print("-" * 30)
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
+
+         # ส่วนรันไทม์
+        runtime = int(time.time() - self.start_time)
+        hours = runtime // 3600
+        minutes = (runtime % 3600) // 60
+        seconds = runtime % 60
+        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
+        print(f"{COLORS['bold']}{'='*60}{COLORS['reset']}")
         
         if 'connection' in miner_data:
             print(f"  เชื่อมต่อกับ: {COLORS['green']}{miner_data['connection']}{COLORS['reset']}")
@@ -212,16 +215,10 @@ class VrscCpuMinerMonitor:
         
         if 'block' in miner_data:
             print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
+ 
+        print("-" * 30)
         
-        print("-" * 60)
-        
-        # ส่วนรันไทม์
-        runtime = int(time.time() - self.start_time)
-        hours = runtime // 3600
-        minutes = (runtime % 3600) // 60
-        seconds = runtime % 60
-        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
-        print(f"{COLORS['bold']}{'='*60}{COLORS['reset']}")
+       
     
     def run(self):
         try:
