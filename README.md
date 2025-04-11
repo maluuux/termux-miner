@@ -1,7 +1,6 @@
 
 ```
 termux-setup-storage
-termux-sensor -l
 ```
 ```
 yes | pkg update -y
