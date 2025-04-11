@@ -11,7 +11,5 @@ if [ -f "./start.sh" ]; then
     # รันสคริปต์
     ./start.sh
 else
-    echo "Error: start.sh not found in current directory"
-    echo "Please make sure you're in the correct directory"
-    exit 1
+
 fi
