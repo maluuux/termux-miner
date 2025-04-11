@@ -161,7 +161,7 @@ class VrscCpuMinerMonitor:
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        print("-" * 60)
+        print("-" * 20)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
         print(f"{COLORS['bold']}👤 ข้อมูลผู้ขุด:{COLORS['reset']}")
@@ -171,8 +171,9 @@ class VrscCpuMinerMonitor:
         # ส่วนการตั้งค่าการขุด
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
         print(f"  Pools:")
-        for i, pool in enumerate(self.config['pools'], 1):(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
-        print("-" * 30)
+        for i, pool in enumerate(self.config['pools'], 1):
+            (f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
+        print(" " * 30)
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
@@ -183,7 +184,7 @@ class VrscCpuMinerMonitor:
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
         print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
-        print(f"{COLORS['bold']}{'='*60}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['reset']}")
         
         if 'connection' in miner_data:
             print(f"  เชื่อมต่อกับ: {COLORS['green']}{miner_data['connection']}{COLORS['reset']}")
@@ -213,13 +214,11 @@ class VrscCpuMinerMonitor:
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
             print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
-        
+            print("⛏️          ⛏️")
         if 'block' in miner_data:
             print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
  
-        print("-" * 30)
-        
-       
+     
     
     def run(self):
         try:
