@@ -170,7 +170,9 @@ class VrscCpuMinerMonitor:
         
         # ส่วนการตั้งค่าการขุด
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Pools: {COLORS['blue']}{pool}{COLORS['reset']}")
+        print(f"  Pools:")
+        for i, pool in enumerate(self.config['pools'], 1):
+            print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
       
         print(" " * 30)
         
