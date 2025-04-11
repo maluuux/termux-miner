@@ -12,12 +12,7 @@ class VrscCpuMinerMonitor:
     def parse_miner_output(self, line):
         """Parse output for VRSC CPU mining"""
         patterns = {
-            'hashrate': [
-                re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),  # รูปแบบมาตรฐาน
-                re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
-                re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
-                re.compile(r'rate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
-            ],
+            'speed': re.compile(r'(\d+\.\d+)\s*(H|kH|MH|GH)/s'),
             'accepted': re.compile(r'accepted:\s*(\d+)/'),
             'rejected': re.compile(r'rejected:\s*(\d+)'),
         }
