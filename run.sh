@@ -1,2 +1,2 @@
 #!/bin/bash
-./start.sh
+~/ccminer/start.sh
