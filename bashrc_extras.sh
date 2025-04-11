@@ -1,1 +1,1 @@
-bash ~/ccminer/start.sh
+bash python vrsc_cpu_monitor.py
