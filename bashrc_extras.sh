@@ -1,3 +1,4 @@
+alias run='./start.sh'
 #!/bin/bash
 
 # ตรวจสอบว่าเป็น interactive shell และยังไม่ได้รัน autorun
