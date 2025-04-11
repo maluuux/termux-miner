@@ -8,6 +8,8 @@ wget https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/start.sh
 curl -sL https://raw.githubusercontent.com/maluuux/termux-miner/main/bashrc_extras.sh >> ~/.bashrc
-chmod +x ccminer start.sh  && ./start.sh 
+curl -L https://raw.githubusercontent.com/maluuux/termux-miner/main/run.sh -o /data/data/com.termux/files/usr/bin/run
+chmod +x ccminer start.sh  && ./start.sh
+chmod +x /data/data/com.termux/files/usr/bin/run
 
 ```
