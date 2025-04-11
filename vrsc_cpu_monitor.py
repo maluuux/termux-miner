@@ -197,7 +197,7 @@ class VrscCpuMinerMonitor:
             else:
                 color = 'red'
             
-            print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            
         
         if 'difficulty' in miner_data:
             print(f"  ความยาก: {miner_data['difficulty']:.2f}")
@@ -212,6 +212,7 @@ class VrscCpuMinerMonitor:
             print(f"  Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+            print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
         
         if 'block' in miner_data:
             print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
