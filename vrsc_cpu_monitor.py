@@ -2,112 +2,168 @@ import subprocess
 import re
 import time
 from datetime import datetime
+import json
+import os
 
 class VrscCpuMinerMonitor:
     def __init__(self):
         self.hashrate_history = []
         self.start_time = time.time()
-        self.max_history = 30  # จำนวนค่าที่เก็บไว้แสดงกราฟ
+        self.max_history = 30
+        self.config = self.load_config()
         
+    def load_config(self):
+        """โหลดการตั้งค่าจากไฟล์ config"""
+        config = {
+            'wallet': 'ไม่ระบุ',
+            'miner_name': 'ไม่ระบุ',
+            'threads': 'ไม่ระบุ',
+            'pools': [],
+            'algorithm': 'ไม่ระบุ'
+        }
+        
+        try:
+            # ลองหาไฟล์ config ในที่ต่างๆ
+            config_paths = [
+                'config.json',
+                '/data/data/com.termux/files/home/config.json',
+                '/data/data/com.termux/files/usr/etc/verus/config.json'
+            ]
+            
+            for path in config_paths:
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        config.update(json.load(f))
+                    break
+                    
+        except Exception as e:
+            print(f"ไม่สามารถโหลด config ได้: {e}")
+            
+        return config
+    
     def parse_miner_output(self, line):
-        """Parse output for VRSC CPU mining"""
+        """Parse output จาก miner"""
         patterns = {
-            'rate': re.compile(r'(\d+\.\d+)\s*(H|kH|MH|GH)/s'),
-            'accepted': re.compile(r'accepted:\s*(\d+)/'),
-            'rejected': re.compile(r'rejected:\s*(\d+)'),
+            'hashrate': [
+                re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
+                re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
+                re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
+            ],
+            'accepted': re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
+            'rejected': re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
+            'difficulty': re.compile(r'difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+            'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
+            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE)
         }
         
         results = {}
-        for key, pattern in patterns.items():
-            match = pattern.search(line.lower())
+        
+        # หา hashrate
+        for pattern in patterns['hashrate']:
+            match = pattern.search(line)
             if match:
-                if key == 'hashrate':
+                try:
                     value = float(match.group(1))
-                    unit = match.group(2)
-                    # Convert to H/s
-                    if unit == 'kH':
-                        value *= 1000
-                    elif unit == 'MH':
-                        value *= 1000000
-                    elif unit == 'GH':
-                        value *= 1000000000
-                    results[key] = value
-                    # Keep history for chart
+                    unit = match.group(2).upper()
+                    conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
+                    value *= conversions.get(unit, 1)
+                    results['hashrate'] = value
                     self.hashrate_history.append(value)
                     if len(self.hashrate_history) > self.max_history:
                         self.hashrate_history.pop(0)
-                elif key in ['accepted', 'rejected']:
+                    break
+                except:
+                    continue
+        
+        # หา accepted/rejected
+        for key in ['accepted', 'rejected']:
+            match = patterns[key].search(line)
+            if match:
+                try:
                     results[key] = int(match.group(1))
+                except:
+                    pass
+        
+        # หา difficulty
+        match = patterns['difficulty'].search(line)
+        if match:
+            try:
+                results['difficulty'] = float(match.group(1))
+            except:
+                pass
+        
+        # หา share (ถ้ามีรูปแบบ share: 10/15)
+        match = patterns['share'].search(line)
+        if match:
+            try:
+                results['accepted'] = int(match.group(1))
+                results['rejected'] = int(match.group(2)) - int(match.group(1))
+            except:
+                pass
+        
+        # หา block
+        match = patterns['block'].search(line)
+        if match:
+            try:
+                results['block'] = int(match.group(1))
+            except:
+                pass
         
         return results
     
     def format_hashrate(self, hashrate):
-        """Format hashrate to appropriate unit"""
-        if hashrate >= 1000000:  # 1 MH/s
+        """จัดรูปแบบ hashrate"""
+        if hashrate >= 1000000:
             return f"{hashrate/1000000:.2f} MH/s"
-        elif hashrate >= 1000:   # 1 kH/s
+        elif hashrate >= 1000:
             return f"{hashrate/1000:.2f} kH/s"
         return f"{hashrate:.2f} H/s"
     
-    def display_hashrate_chart(self, current_hashrate):
-        """Display a simple ASCII chart of hashrate history"""
-        if not self.hashrate_history:
-            return ""
-        
-        max_hash = max(self.hashrate_history)
-        min_hash = min(self.hashrate_history)
-        range_hash = max_hash - min_hash if max_hash != min_hash else 1
-        
-        chart_height = 5
-        chart = []
-        
-        for i in range(chart_height, 0, -1):
-            threshold = min_hash + (range_hash * i / chart_height)
-            row = []
-            for h in self.hashrate_history:
-                row.append('▓' if h >= threshold else ' ')
-            chart.append(''.join(row))
-        
-        # Add current hashrate indicator
-        chart.append(f"Current: {self.format_hashrate(current_hashrate)}")
-        chart.append(f"Min: {self.format_hashrate(min_hash)} | Max: {self.format_hashrate(max_hash)}")
-        
-        return '\n'.join(chart)
-    
     def display_dashboard(self, miner_data):
-        """Display the mining dashboard"""
-        # ANSI Colors
+        """แสดงผลข้อมูลการขุด"""
         COLORS = {
-            'green': '\033[92m',
-            'yellow': '\033[93m',
-            'red': '\033[91m',
-            'blue': '\033[94m',
-            'cyan': '\033[96m',
-            'reset': '\033[0m',
-            'bold': '\033[1m'
+            'green': '\033[92m', 'yellow': '\033[93m',
+            'red': '\033[91m', 'blue': '\033[94m',
+            'cyan': '\033[96m', 'purple': '\033[95m',
+            'reset': '\033[0m', 'bold': '\033[1m'
         }
         
-        # Clear screen
+        # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
         
-        # Header
-        print(f"{COLORS['bold']}{COLORS['blue']}=== VRSC CPU Mining ==={COLORS['reset']}")
-        print(f"{COLORS['cyan']}⛏️ แรงขุด VerusCoin (VRSC) - {datetime.now().strftime('%H:%M:%S')}{COLORS['reset']}")
-        print("-" * 50)
+        # ส่วนหัว
+        print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
+        print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print("-" * 60)
         
-        # Mining Status Section
+        # ส่วนการตั้งค่า
+        print(f"{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
+        print(f"  กระเป๋า: {COLORS['blue']}{self.config['wallet']}{COLORS['reset']}")
+        print(f"  ชื่อเครื่องขุด: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
+        print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
+        print(f"  Algorithm: {COLORS['blue']}{self.config['algorithm']}{COLORS['reset']}")
+        print(f"  Pools:")
+        for i, pool in enumerate(self.config['pools'], 1):
+            print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
+        
+        print("-" * 60)
+        
+        # ส่วนสถานะการขุด
+        print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
+        
         if 'hashrate' in miner_data:
             hashrate = miner_data['hashrate']
             if hashrate > 10000:
-                hash_color = 'green'
+                color = 'green'
             elif hashrate > 1000:
-                hash_color = 'yellow'
+                color = 'yellow'
             else:
-                hash_color = 'red'
+                color = 'red'
             
-            print(f"{COLORS['bold']}แรงขุดปัจจุบัน:{COLORS['reset']}")
-            print(f"{COLORS[hash_color]}{' ' * 10}{self.format_hashrate(hashrate)}{' ' * 10}{COLORS['reset']}")
-            print("\n" + self.display_hashrate_chart(hashrate))
+            print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+        
+        if 'difficulty' in miner_data:
+            print(f"  ความยาก: {miner_data['difficulty']:.2f}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
@@ -116,36 +172,48 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
             
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"\n{COLORS['bold']}Shares:{COLORS['reset']} {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+            print(f"  Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
-        print("-" * 50)
+        if 'block' in miner_data:
+            print(f"  บล็อกที่พบ: {miner_data['block']}")
+        
+        print("-" * 60)
+        
+        # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
-        print(f"{COLORS['cyan']}Runtime: {runtime//3600}h {(runtime%3600)//60}m {runtime%60}s{COLORS['reset']}")
-        print(f"{COLORS['bold']}{'='*50}{COLORS['reset']}")
+        hours = runtime // 3600
+        minutes = (runtime % 3600) // 60
+        seconds = runtime % 60
+        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
+        print(f"{COLORS['bold']}{'='*60}{COLORS['reset']}")
     
     def run(self):
-        # Start mining process
-        process = subprocess.Popen(
-            ["./start.sh"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            bufsize=1
-        )
-        
         try:
+            process = subprocess.Popen(
+                ["./start.sh"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1
+            )
+            
+            print("กำลังเริ่มต้นเครื่องขุด... (กด Ctrl+C เพื่อหยุด)")
+            
             for line in iter(process.stdout.readline, ''):
                 miner_data = self.parse_miner_output(line)
                 if miner_data:
                     self.display_dashboard(miner_data)
-                    
+                
         except KeyboardInterrupt:
-            print("\nหยุดการตรวจสอบ...")
-            process.terminate()
+            print("\nกำลังหยุดการตรวจสอบ...")
+        except Exception as e:
+            print(f"\nเกิดข้อผิดพลาด: {e}")
         finally:
-            process.wait()
+            if 'process' in locals():
+                process.terminate()
+                process.wait()
 
 if __name__ == "__main__":
     monitor = VrscCpuMinerMonitor()
