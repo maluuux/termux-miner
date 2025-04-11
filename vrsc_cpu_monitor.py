@@ -15,6 +15,8 @@ class VrscCpuMinerMonitor:
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
         default_config = {
+            'wallet_address': 'ไม่ระบุ',
+            'miner_name': 'ไม่ระบุ',
             'user': 'ไม่ระบุ',
             'pass': 'ไม่ระบุ',
             'algo': 'ไม่ระบุ',
@@ -28,7 +30,6 @@ class VrscCpuMinerMonitor:
         }
         
         try:
-            # ลองหาไฟล์ config ในที่ต่างๆ
             config_paths = [
                 'config.json',
                 '/data/data/com.termux/files/home/config.json',
@@ -40,7 +41,16 @@ class VrscCpuMinerMonitor:
                     with open(path, 'r') as f:
                         loaded_config = json.load(f)
                         
-                        # ปรับโครงสร้าง pools ให้ตรงกับรูปแบบใหม่
+                        # แยก wallet address จาก user ถ้าไม่ระบุ wallet_address โดยตรง
+                        if 'wallet_address' not in loaded_config and 'user' in loaded_config:
+                            user_parts = loaded_config['user'].split('.')
+                            if len(user_parts) > 0:
+                                loaded_config['wallet_address'] = user_parts[0]
+                            
+                            if len(user_parts) > 1:
+                                loaded_config['miner_name'] = user_parts[1]
+                        
+                        # ปรับโครงสร้าง pools
                         if 'pools' in loaded_config and isinstance(loaded_config['pools'], list):
                             if len(loaded_config['pools']) > 0 and isinstance(loaded_config['pools'][0], dict):
                                 loaded_config['pools'] = [pool['url'] for pool in loaded_config['pools'] if 'url' in pool]
@@ -153,16 +163,16 @@ class VrscCpuMinerMonitor:
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         print("-" * 60)
         
-        # ส่วนการตั้งค่า
-        print(f"{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
-        print(f"  ผู้ใช้: {COLORS['blue']}{self.config['user']}{COLORS['reset']}")
+        # ส่วนข้อมูลผู้ใช้และ Miner
+        print(f"{COLORS['bold']}👤 ข้อมูลผู้ขุด:{COLORS['reset']}")
+        print(f"  ที่อยู่กระเป๋า: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
+        print(f"  ชื่อ Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
+        print(f"  ผู้ใช้ (User): {COLORS['blue']}{self.config['user']}{COLORS['reset']}")
+        
+        # ส่วนการตั้งค่าการขุด
+        print(f"\n{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
         print(f"  อัลกอริทึม: {COLORS['blue']}{self.config['algo']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  ความสำคัญ CPU: {COLORS['blue']}{self.config['cpu-priority']}{COLORS['reset']}")
-        print(f"  CPU Affinity: {COLORS['blue']}{self.config['cpu-affinity']}{COLORS['reset']}")
-        print(f"  พักก่อนเชื่อมต่อใหม่: {COLORS['blue']}{self.config['retry-pause']} วินาที{COLORS['reset']}")
-        print(f"  API Allow: {COLORS['blue']}{self.config['api-allow']}{COLORS['reset']}")
-        print(f"  API Bind: {COLORS['blue']}{self.config['api-bind']}{COLORS['reset']}")
         print(f"  Pools:")
         for i, pool in enumerate(self.config['pools'], 1):
             print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
