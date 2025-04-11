@@ -50,11 +50,11 @@ echo "██║ ╚═╝ ██║██║██║ ╚████║██�
 echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
 echo -e "\033[0m"
  echo ""
-  echo -e "${YELLOW} เลขกระเป๋า: ${GREEN}$WALLET_ADDRESS"
-  echo -e "${YELLOW} ชื่อ miner: ${RED}$WORKER_NAME"
-  echo -e "${YELLOW} อัลกอริทึม: ${GREEN}$ALGO"
-  echo -e "${YELLOW} threads : ${CYAN}$THREADS"
-  echo -e "${YELLOW}Retry Pause: ${BLUE}$RETRY_PAUSE"
+  echo -e "${YELLOW}เลขกระเป๋า 💎: ${GREEN}$WALLET_ADDRESS"
+  echo -e "${YELLOW}ชื่อ miner 👷 : ${RED}$WORKER_NAME"
+  echo -e "${YELLOW}อัลกอริทึม ⚙️ : ${GREEN}$ALGO"
+  echo -e "${YELLOW}threads ⚡ : ${CYAN}$THREADS"
+  echo -e "${YELLOW}Retry Pause 🔄 : ${BLUE}$RETRY_PAUSE"
   # แสดง Pools ที่ใช้งานอยู่
   echo -e "${CYAN}=== ACTIVE MINING POOLS ==="
   jq -c '.pools[] | select(.disabled == 0)' "$CONFIG_FILE" | while read -r pool; do
@@ -63,21 +63,13 @@ echo -e "\033[0m"
     POOL_TIMEOUT=$(echo "$pool" | jq -r '.timeout')
     
     echo -e "${YELLOW}Pool: ${GREEN}$POOL_NAME"
-    echo -e "  ${CYAN}URL: ${BLUE}$POOL_URL"
-    echo -e "  ${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT"
+    echo -e "${CYAN}URL: ${BLUE}$POOL_URL"
+    echo -e "${YELLOW}Timeout: ${GREEN}$POOL_TIMEOUT"
     echo -e "\033[0m"
   done
 
 #!/bin/bash
-
-count=10
-echo -n "$count"  # -n เพื่อไม่ขึ้นบรรทัดใหม่
-while [ $count -gt 0 ]; do
-    sleep 1
-    count=$((count - 1))
-    echo -ne "\rโปรแกรมจะเริ่มใน: $count"  # \r เพื่อลบบรรทัดเดิม
-done
-echo -e "\nเริ่มโปรแกรม!"
+sleep 5
 }
 
 # เรียกใช้งานฟังก์ชัน
