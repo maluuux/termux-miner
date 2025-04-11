@@ -1,5 +1,5 @@
 # ดาวน์โหลดสคริปต์จาก GitHub
-curl -L https://raw.githubusercontent.com/[username]/[repo]/[branch]/run.sh -o /data/data/com.termux/files/usr/bin/run
+curl -L https://raw.githubusercontent.com/maluuux/termux-miner/main/run.sh -o /data/data/com.termux/files/usr/bin/run
 
 # ให้สิทธิ์การรัน
 chmod +x /data/data/com.termux/files/usr/bin/run
