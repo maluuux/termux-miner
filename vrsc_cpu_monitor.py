@@ -168,12 +168,12 @@ class VrscCpuMinerMonitor:
         }
 
     def get_cpu_usage(self):
-        """ตรวจสอบ % การใช้ CPU แบบง่ายๆ"""
         try:
             return psutil.cpu_percent(interval=1)
         except:
             return 0  # คืนค่า 0 หากตรวจสอบไม่ได้  
         # ตรวจสอบและแสดงผล % CPU
+        
         cpu_usage = self.get_cpu_usage()        
         # แสดงผลแบบที่ทำงานได้แน่นอน
         if cpu_usage < 50:
