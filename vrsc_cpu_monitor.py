@@ -224,7 +224,7 @@ class VrscCpuMinerMonitor:
             diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 300000 else 'red'
             print(f"  {COLORS['bold']}Difficulty: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
-                print(f"  {COLORS['yellow']}(อัปเดตข้อมูล... 🔄){COLORS['reset']}")
+                print(f"  {COLORS['yellow']}( ⏳ ⏳ ⏳ ⏳ ⏳){COLORS['reset']}")
         else:
             print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
