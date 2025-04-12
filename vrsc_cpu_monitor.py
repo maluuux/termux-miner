@@ -208,8 +208,13 @@ class VrscCpuMinerMonitor:
             
             
         
-        if 'difficulty' in miner_data:
-            print(f"  ความยาก: {miner_data['difficulty']:.2f}")
+        # แสดง difficulty
+        current_diff = miner_data.get('difficulty', self.last_difficulty)
+        if current_diff is not None:
+            diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 1000 else 'red'
+            print(f"  ความยาก: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+        else:
+            print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
