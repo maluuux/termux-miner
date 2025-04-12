@@ -165,7 +165,7 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}🛠️Show settings🛠️{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏ Show settings ⛏ ==={COLORS['reset']}")
         print(f"  Wallet: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
@@ -174,7 +174,7 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนสถานะการขุด
-        print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
