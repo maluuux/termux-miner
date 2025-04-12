@@ -1,1 +1,1 @@
-~/ccminer/vrsc_cpu_monitor.py
+~/ccminer/python vrsc_cpu_monitor.py
