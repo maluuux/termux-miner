@@ -160,8 +160,8 @@ class VrscCpuMinerMonitor:
             'green_bg': '\033[42m',
             'orange_bg': '\033[48;5;208m',
             'black_text': '\033[30m',
-            'white_bg' = '\033[48;5;15m',
-            'orange_text' = '\033[38;5;208m'
+            'white_bg':'\033[48;5;15m',
+            'orange_text':'\033[38;5;208m'
         }
         
         # ล้างหน้าจอ
