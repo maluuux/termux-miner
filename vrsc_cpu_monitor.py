@@ -79,7 +79,12 @@ class VrscCpuMinerMonitor:
                 re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
                 re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
             ],
-            'difficulty': re.compile(r'difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+            'difficulty': [
+                re.compile(r'difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'diff:\s*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'network difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'current difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+            ],
             'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
             'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
             'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
@@ -201,8 +206,8 @@ class VrscCpuMinerMonitor:
             
             
         
-        if 'diff' in miner_data:
-            print(f"  ความยาก: {miner_data['diff']:.2f}")
+        if 'difficulty' in miner_data:
+            print(f"  ความยาก: {miner_data['difficulty']:.2f}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
