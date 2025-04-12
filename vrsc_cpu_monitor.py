@@ -14,17 +14,11 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
-        
+     
+    # ตรวจสอบ % การใช้ CPU   
     def get_cpu_info(self):
-    #"""ตรวจสอบการใช้งาน CPU"""
-    # ตรวจสอบ % การใช้ CPU
         cpu_percent = psutil.cpu_percent(interval=1)  
-    # ตรวจสอบอุณหภูมิ (ถ้าได้)
-          try:
-        cpu_temp = psutil.sensors_temperatures()['cpu_thermal'][0].current
-        except:
-        cpu_temp = "N/A"  
-        return cpu_percent, cpu_temp
+        return cpu_percent
         
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
@@ -196,8 +190,6 @@ class VrscCpuMinerMonitor:
 
         # ตรวจสอบ CPU
         cpu_usage, cpu_temp = self.get_cpu_info()
-
-        # แสดงผล
             print(f"  CPU Usage: ", end="")
         if cpu_usage < 50:
                 print(f"{COLORS['green']}{cpu_usage}%{COLORS['reset']}")
@@ -206,7 +198,6 @@ class VrscCpuMinerMonitor:
             else:
                 print(f"{COLORS['red']}{cpu_usage}%{COLORS['reset']}")
 
-                print(f"  CPU Temp: {cpu_temp}°C")
 
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
