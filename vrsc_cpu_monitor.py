@@ -168,11 +168,11 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
         
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC Miner ==={COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}   VRSC Miner Edit by ...... {COLORS['reset']}")
         print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}      Show settings{COLORS['reset']}")
         print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
@@ -232,7 +232,7 @@ class VrscCpuMinerMonitor:
             diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
             print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
-                print(f"  {COLORS['yellow']}∋━━o(｀∀´oメ）～→━━{COLORS['reset']}")
+                print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}.              .{COLORS['reset']}")
         else:
             print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
