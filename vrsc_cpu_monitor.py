@@ -189,7 +189,7 @@ class VrscCpuMinerMonitor:
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
         # ตรวจสอบ CPU
-        cpu_usage, cpu_temp = self.get_cpu_info()
+        cpu_usage = self.get_cpu_info()
             print(f"  CPU Usage: ", end="")
         if cpu_usage < 50:
                 print(f"{COLORS['green']}{cpu_usage}%{COLORS['reset']}")
