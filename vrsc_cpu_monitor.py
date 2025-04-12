@@ -265,7 +265,7 @@ class VrscCpuMinerMonitor:
                 bufsize=1
             )
             
-            print(f"{COLORS['green_bg']}{COLORS['black_text']}กำลังเริ่มต้นเครื่องขุด... {COLORS['reset']} {COLORS['orange_bg']}{COLORS['black_text']} (กด Ctrl+C เพื่อหยุด){COLORS['reset']}")
+            print("กำลังเริ่มต้นเครื่องขุด...กด Ctrl+C เพื่อหยุด")
             
             for line in iter(process.stdout.readline, ''):
                 miner_data = self.parse_miner_output(line)
