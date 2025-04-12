@@ -167,12 +167,12 @@ class VrscCpuMinerMonitor:
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
 
-         print(f"  {COLORS['brown']}██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ {COLORS['reset']}"),
-         print(f"  {COLORS['brown']}██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
-         print(f"  {COLORS['brown']}██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝{COLORS['reset']}"),
-         print(f"  {COLORS['brown']}╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
-         print(f"  {COLORS['brown']} ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║{COLORS['reset']}"),
-         print(f"  {COLORS['brown']}  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝{COLORS['reset']}")
+         print(f"{COLORS['bold']}██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ {COLORS['reset']}"),
+         print(f"{COLORS['bold']}██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
+         print(f"{COLORS['bold']}██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝{COLORS['reset']}"),
+         print(f"{COLORS['bold']}╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
+         print(f"{COLORS['bold']} ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║{COLORS['reset']}"),
+         print(f"{COLORS['bold']}  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝{COLORS['reset']}")
 
       
         
