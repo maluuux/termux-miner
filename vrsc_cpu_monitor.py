@@ -197,6 +197,11 @@ class VrscCpuMinerMonitor:
             else:
                 color = 'red'
             print(f"  {COLORS['bold']}Hashrate: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+
+            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
+                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
         # แสดง difficulty (วิธีใหม่)
         current_diff = None
@@ -234,10 +239,7 @@ class VrscCpuMinerMonitor:
             total = accepted + rejected
             ratio = (accepted / total * 100) if total > 0 else 100
             
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
-                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
-                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+            
         
         
         
