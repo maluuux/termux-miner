@@ -246,8 +246,8 @@ class VrscCpuMinerMonitor:
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
             print(f"{COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
-            print(f"            {COLORS['green']}[Accepted!🚀 {accepted} ]{COLORS['reset']}"),
-            print(f"            {COLORS['red'  ]}[Rejected!💢 {rejected} ]{COLORS['reset']}")
+            print(f"            {COLORS['green']}[Accepted!🚀 {accepted} {COLORS['reset']}"),
+            print(f"            {COLORS['red'  ]}[Rejected!💢 {rejected} {COLORS['reset']}")
         
         
         
