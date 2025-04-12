@@ -195,20 +195,20 @@ class VrscCpuMinerMonitor:
         # วิธีที่ 1: ใช้ค่าจาก miner output
         if 'difficulty' in miner_data:
             current_diff = miner_data['difficulty']
-            print(f"DEBUG: Using current difficulty from output")  # Debug message
+            #print(f"DEBUG: Using current difficulty from output")  # Debug message
         
         # วิธีที่ 2: คำนวณจาก hashrate และ shares (หากมีข้อมูล)
         elif 'hashrate' in miner_data and 'accepted' in miner_data and miner_data['accepted'] > 0:
             try:
                 current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
-                print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
+                #print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
             except Exception as e:
-                print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
+                #print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
         
         # วิธีที่ 3: ใช้ค่าล่าสุดที่เก็บไว้ (หากยังไม่เกิน 5 นาที)
         elif self.last_difficulty is not None and (time.time() - (self.last_update_time or 0)) < 300:
             current_diff = self.last_difficulty
-            print(f"DEBUG: Using last known difficulty")  # Debug message
+            #print(f"DEBUG: Using last known difficulty")  # Debug message
         
         # แสดงผล
         if current_diff is not None:
@@ -241,7 +241,7 @@ class VrscCpuMinerMonitor:
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
         print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
-        print(f"{COLORS['bold']}{'='*60}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{'='*0}{COLORS['reset']}")
     
     def run(self):
         try:
