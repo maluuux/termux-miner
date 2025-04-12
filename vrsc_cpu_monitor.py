@@ -154,6 +154,7 @@ class VrscCpuMinerMonitor:
             'red': '\033[91m', 'blue': '\033[94m',
             'cyan': '\033[96m', 'purple': '\033[95m',
             'reset': '\033[0m', 'bold': '\033[1m',
+            'brown': '\033[33m',
             'Light_Gray':'\033[37m',
             'yellow_bg': '\033[43m',
             'green_bg': '\033[42m',
@@ -227,7 +228,7 @@ class VrscCpuMinerMonitor:
 
         # แสดงผล
         if current_diff is not None:
-            diff_color = 'green' if current_diff < 100000 else 'yellow' if current_diff < 300000 else 'red'
+            diff_color = 'green' if current_diff < 100000 else 'yellow' if current_diff < 300000 else 'brown'
             print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}=== ⏳ ⏳ ⏳ ⏳ ⏳ ==={COLORS['reset']}")
@@ -264,7 +265,7 @@ class VrscCpuMinerMonitor:
                 bufsize=1
             )
             
-            print("กำลังเริ่มต้นเครื่องขุด... (กด Ctrl+C เพื่อหยุด)")
+            print(f"{COLORS['green_bg']}{COLORS['black_text']}กำลังเริ่มต้นเครื่องขุด... {COLORS['reset']} {COLORS['orange_bg']}{COLORS['black_text']} (กด Ctrl+C เพื่อหยุด){COLORS['reset']}")
             
             for line in iter(process.stdout.readline, ''):
                 miner_data = self.parse_miner_output(line)
