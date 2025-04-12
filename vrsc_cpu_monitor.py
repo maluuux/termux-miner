@@ -84,6 +84,7 @@ class VrscCpuMinerMonitor:
                 re.compile(r'diff:\s*(\d+\.?\d*)', re.IGNORECASE),
                 re.compile(r'network difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
                 re.compile(r'current difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'\[\d+\] diff:\s*(\d+\.?\d*)', re.IGNORECASE)
             ],
             'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
             'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
@@ -120,17 +121,16 @@ class VrscCpuMinerMonitor:
                     except:
                         continue
         
-        # หาค่าอื่นๆ
-        for key in ['difficulty', 'block', 'connection']:
-            match = patterns[key].search(line)
+        # หาค่า difficulty
+        for pattern in patterns['difficulty']:
+            match = pattern.search(line)
             if match:
                 try:
-                    if key == 'difficulty':
-                        results[key] = float(match.group(1))
-                    else:
-                        results[key] = match.group(1).strip()
-                except:
-                    pass
+                    results['difficulty'] = float(match.group(1))
+                    self.last_difficulty = results['difficulty']
+                    break
+                except (ValueError, IndexError):
+                    continue
         
         # หา share (ถ้ามีรูปแบบ share: 10/15)
         match = patterns['share'].search(line)
