@@ -14,12 +14,7 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
-     
-    # ตรวจสอบ % การใช้ CPU   
-    def get_cpu_info(self):
-        cpu_percent = psutil.cpu_percent(interval=1)  
-        return cpu_percent
-        
+       
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
         default_config = {
@@ -187,17 +182,6 @@ class VrscCpuMinerMonitor:
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
-
-        # ตรวจสอบ CPU
-        cpu_usage = self.get_cpu_info()
-            print(f"  CPU Usage: ", end="")
-        if cpu_usage < 50:
-                print(f"{COLORS['green']}{cpu_usage}%{COLORS['reset']}")
-            elif cpu_usage < 80:
-                print(f"{COLORS['yellow']}{cpu_usage}%{COLORS['reset']}")
-            else:
-                print(f"{COLORS['red']}{cpu_usage}%{COLORS['reset']}")
-
 
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
