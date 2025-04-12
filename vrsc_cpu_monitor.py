@@ -154,7 +154,11 @@ class VrscCpuMinerMonitor:
             'red': '\033[91m', 'blue': '\033[94m',
             'cyan': '\033[96m', 'purple': '\033[95m',
             'reset': '\033[0m', 'bold': '\033[1m',
-            'green_bg': '\033[42m','black_text': '\033[30m'
+            'Light_Gray':'\033[37m',
+            'yellow_bg': '\033[43m',
+            'green_bg': '\033[42m',
+            'orange_bg': '\033[48;5;208m',
+            'black_text': '\033[30m'
         }
         
         # ล้างหน้าจอ
@@ -197,7 +201,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']}: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            print(f"  {COLORS['green_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
             
         
         # แสดง difficulty (วิธีใหม่)
@@ -224,11 +228,11 @@ class VrscCpuMinerMonitor:
         # แสดงผล
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100000 else 'yellow' if current_diff < 300000 else 'red'
-            print(f"  {COLORS['bold']}Difficulty: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Difficulty : {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}( ⏳ ⏳ ⏳ ⏳ ⏳){COLORS['reset']}")
         else:
-            print(f"  {COLORS['bold']}Difficulty: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Difficulty : {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
@@ -237,7 +241,7 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+            print(f"  {COLORS['orange_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
