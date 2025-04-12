@@ -11,7 +11,8 @@ class VrscCpuMinerMonitor:
         self.start_time = time.time()
         self.max_history = 30
         self.config = self.load_config()
-        self.last_difficulty = None  # เพิ่มตัวแปรนี้
+        self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
+        self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
         
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
@@ -78,11 +79,12 @@ class VrscCpuMinerMonitor:
                 re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
             ],
             'difficulty': [
-                re.compile(r'difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'diff:\s*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'network difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'current difficulty:\s*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'\[\d+\] diff:\s*(\d+\.?\d*)', re.IGNORECASE)
+                re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
             ],
             'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
             'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
@@ -98,8 +100,11 @@ class VrscCpuMinerMonitor:
                 try:
                     results['difficulty'] = float(match.group(1))
                     self.last_difficulty = results['difficulty']
+                    self.last_update_time = time.time()
+                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
                     break
-                except (ValueError, IndexError):
+                except (ValueError, IndexError) as e:
+                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
         
         # หาค่าอื่นๆ
@@ -156,7 +161,6 @@ class VrscCpuMinerMonitor:
         
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
-        print("-" * 60)
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         print("-" * 60)
         
@@ -190,11 +194,33 @@ class VrscCpuMinerMonitor:
                 color = 'red'
             print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
         
-        # แสดง difficulty
-        current_diff = miner_data.get('difficulty', self.last_difficulty)
+        # แสดง difficulty (วิธีใหม่)
+        current_diff = None
+        
+        # วิธีที่ 1: ใช้ค่าจาก miner output
+        if 'difficulty' in miner_data:
+            current_diff = miner_data['difficulty']
+            print(f"DEBUG: Using current difficulty from output")  # Debug message
+        
+        # วิธีที่ 2: คำนวณจาก hashrate และ shares (หากมีข้อมูล)
+        elif 'hashrate' in miner_data and 'accepted' in miner_data and miner_data['accepted'] > 0:
+            try:
+                current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
+                print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
+            except Exception as e:
+                print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
+        
+        # วิธีที่ 3: ใช้ค่าล่าสุดที่เก็บไว้ (หากยังไม่เกิน 5 นาที)
+        elif self.last_difficulty is not None and (time.time() - (self.last_update_time or 0)) < 300:
+            current_diff = self.last_difficulty
+            print(f"DEBUG: Using last known difficulty")  # Debug message
+        
+        # แสดงผล
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 1000 else 'red'
             print(f"  ความยาก: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            if 'difficulty' not in miner_data:
+                print(f"  {COLORS['yellow']}(ค่าประมาณ){COLORS['reset']}")
         else:
             print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
