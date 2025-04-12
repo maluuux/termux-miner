@@ -4,6 +4,9 @@ import time
 from datetime import datetime
 import json
 import os
+import psutil
+
+
 
 class VrscCpuMinerMonitor:
     def __init__(self):
@@ -163,6 +166,14 @@ class VrscCpuMinerMonitor:
             'white_bg':'\033[48;5;15m',
             'orange_text':'\033[38;5;208m'
         }
+
+        def get_cpu_usage(self):
+        """ตรวจสอบ % การใช้ CPU แบบง่ายๆ"""
+        try:
+            return psutil.cpu_percent(interval=1)
+        except:
+            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้
+        }
         
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
@@ -185,6 +196,17 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
+        # ตรวจสอบและแสดงผล % CPU
+        cpu_usage = self.get_cpu_usage()        
+        # แสดงผลแบบที่ทำงานได้แน่นอน
+        if cpu_usage < 50:
+            cpu_color = COLORS['green']
+        elif cpu_usage < 80:
+            cpu_color = COLORS['yellow']
+        else:
+            cpu_color = COLORS['red'] 
+        print(f"  CPU Usage: {cpu_color}{cpu_usage}%{COLORS['reset']}")
+        
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
@@ -205,7 +227,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}🚀🚀")
+            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
             
         
         # แสดง difficulty (วิธีใหม่)
