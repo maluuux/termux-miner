@@ -201,8 +201,8 @@ class VrscCpuMinerMonitor:
             
             
         
-        if 'difficulty' in miner_data:
-            print(f"  ความยาก: {miner_data['difficulty']:.2f}")
+        if 'diff' in miner_data:
+            print(f"  ความยาก: {miner_data['diff']:.2f}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
