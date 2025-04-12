@@ -201,7 +201,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['green_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            print(f"  {COLORS['green_bg']}{COLORS['bold']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
             
         
         # แสดง difficulty (วิธีใหม่)
@@ -228,11 +228,11 @@ class VrscCpuMinerMonitor:
         # แสดงผล
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100000 else 'yellow' if current_diff < 300000 else 'red'
-            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Difficulty : {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}( ⏳ ⏳ ⏳ ⏳ ⏳){COLORS['reset']}")
         else:
-            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Difficulty : {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['bold']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
@@ -241,7 +241,7 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['orange_bg']}{COLORS['bold']}{COLORS['Light_Gray']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+            print(f"  {COLORS['orange_bg']}{COLORS['bold']}{COLORS['black_text']}Shares {COLORS['reset']}: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
