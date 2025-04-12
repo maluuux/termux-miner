@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 import json
 import os
-import sys
 
 class VrscCpuMinerMonitor:
     def __init__(self):
@@ -155,8 +154,7 @@ class VrscCpuMinerMonitor:
             'red': '\033[91m', 'blue': '\033[94m',
             'cyan': '\033[96m', 'purple': '\033[95m',
             'reset': '\033[0m', 'bold': '\033[1m',
-            'redB':'\e[31mRed Background\e[0m',
-            'greenB':'\e[42mGreen Background\e[0m'
+            'green_bg': '\033[42m','black_text': '\033[30m'
         }
         
         # ล้างหน้าจอ
@@ -199,8 +197,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['greenB']}Hashrate{COLORS['reset']}: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
-
+            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']}: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
             
         
         # แสดง difficulty (วิธีใหม่)
