@@ -4,9 +4,6 @@ import time
 from datetime import datetime
 import json
 import os
-import psutil
-
-
 
 class VrscCpuMinerMonitor:
     def __init__(self):
@@ -149,7 +146,17 @@ class VrscCpuMinerMonitor:
         elif hashrate >= 1000:
             return f"{hashrate/1000:.2f} kH/s"
         return f"{hashrate:.2f} H/s"
+
     
+    # cpu ///
+    def get_cpu_usage(self):
+        try:
+            # ตรวจสอบ % CPU โดยเฉลี่ยใน 1 วินาที
+            return psutil.cpu_percent(interval=1)
+        except Exception as e:
+            print(f"ไม่สามารถตรวจสอบ CPU: {e}")
+            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้
+
     def display_dashboard(self, miner_data):
         """แสดงผลข้อมูลการขุด"""
         COLORS = {
@@ -166,23 +173,7 @@ class VrscCpuMinerMonitor:
             'white_bg':'\033[48;5;15m',
             'orange_text':'\033[38;5;208m'
         }
-
-    def get_cpu_usage(self):
-        try:
-            return psutil.cpu_percent(interval=1)
-        except:
-            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้  
-        # ตรวจสอบและแสดงผล % CPU
-        
-        cpu_usage = self.get_cpu_usage()        
-        # แสดงผลแบบที่ทำงานได้แน่นอน
-        if cpu_usage < 50:
-            cpu_color = COLORS['green']
-        elif cpu_usage < 80:
-            cpu_color = COLORS['yellow']
-        else:
-            cpu_color = COLORS['red'] 
-        
+  
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
         
@@ -204,8 +195,17 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
-        
-        print(f"  CPU Usage: {cpu_color}{cpu_usage}%{COLORS['reset']}")
+        # ตรวจสอบ % CPU
+        cpu_usage = self.get_cpu_usage()       
+        # เลือกสีตามระดับการใช้งาน
+        if cpu_usage < 50:
+            status = f"{COLORS['green']}กำลังทำงานปกติ{COLORS['reset']}"
+        elif cpu_usage < 80:
+            status = f"{COLORS['yellow']}กำลังทำงานหนัก{COLORS['reset']}"
+        else:
+            status = f"{COLORS['red']}กำลังทำงานหนักมาก!{COLORS['reset']}"
+        # แสดงผล
+        print(f"  การใช้งาน CPU: {cpu_usage}% ({status})")
         
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
