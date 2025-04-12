@@ -166,11 +166,25 @@ class VrscCpuMinerMonitor:
   
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
+
+        def print_verus():
+            cyan = "\033[36m"
+            reset = "\033[0m"
+    
+            verus_art = [
+                "██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ ",
+                "██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗",
+                "██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝",
+                "╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗",
+                " ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║",
+                "  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝"
+            ]
+          for line in verus_art:
+        print(f"{cyan}{line}{reset}")
         
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
@@ -183,13 +197,13 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนสถานะการขุด
-        print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡ Status Miner ⚡ ==={COLORS['reset']}")
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']} 🕘 MinerRunTime : {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']}")
+        print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
         print(f"{COLORS['bold']}{COLORS['reset']}")
         
         
@@ -247,16 +261,7 @@ class VrscCpuMinerMonitor:
             print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
             print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}"),
             print(f"  {COLORS['red'  ]}Rejected!! {rejected} {COLORS['reset']}")
-        
-        
-        
-        if 'block' in miner_data:
-            print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
-        
-        print("-" * 0)
-        
-        
-    
+       
     def run(self):
         try:
             process = subprocess.Popen(
