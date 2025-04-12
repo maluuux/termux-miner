@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 import json
 import os
-import psutil
 
 class VrscCpuMinerMonitor:
     def __init__(self):
