@@ -196,7 +196,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  แรงขุด: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            print(f"  {COLORS['bold']}Hashrate: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
         
         # แสดง difficulty (วิธีใหม่)
         current_diff = None
@@ -222,7 +222,7 @@ class VrscCpuMinerMonitor:
         # แสดงผล
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 300000 else 'red'
-            print(f"  ความยาก: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            print(f"  {COLORS['bold']}Difficulty: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}(ค่าประมาณ){COLORS['reset']}")
         else:
@@ -235,7 +235,7 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
             
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
                   f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
