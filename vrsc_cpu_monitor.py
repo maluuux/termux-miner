@@ -172,8 +172,8 @@ class VrscCpuMinerMonitor:
         try:
             return psutil.cpu_percent(interval=1)
         except:
-            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้
-        }
+            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้  
+        
         
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
