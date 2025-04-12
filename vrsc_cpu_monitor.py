@@ -16,7 +16,7 @@ class VrscCpuMinerMonitor:
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
         
     def get_cpu_info(self):
-    """ตรวจสอบการใช้งาน CPU"""
+    #"""ตรวจสอบการใช้งาน CPU"""
     # ตรวจสอบ % การใช้ CPU
         cpu_percent = psutil.cpu_percent(interval=1)  
     # ตรวจสอบอุณหภูมิ (ถ้าได้)
