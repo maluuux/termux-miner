@@ -199,7 +199,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['greenB']}Hashrate: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            print(f"  {COLORS['greenB']}Hashrate{COLORS['reset']}: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
 
             
         
@@ -231,7 +231,7 @@ class VrscCpuMinerMonitor:
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}( ⏳ ⏳ ⏳ ⏳ ⏳){COLORS['reset']}")
         else:
-            print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
+            print(f"  {COLORS['bold']}Difficulty: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
         if 'accepted' in miner_data or 'rejected' in miner_data:
             accepted = miner_data.get('accepted', 0)
