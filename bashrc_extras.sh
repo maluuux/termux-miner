@@ -1,1 +1,1 @@
-~/ccminer/python vrsc_cpu_monitor.py
+cd ccminer && python3 vrsc_cpu_monitor.py
