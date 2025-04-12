@@ -169,7 +169,7 @@ class VrscCpuMinerMonitor:
         print(f"  Wallet: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Pools: {', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}")
+        print(f"  Pools: {COLORS['blue']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
         
         print("-" * 0)
         
@@ -181,7 +181,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']} 🚀 Working Time : {COLORS['green']}{hours}h {COLORS['yellow']}{minutes}m {seconds}s 🚀{COLORS['reset']}")
+        print(f"{COLORS['cyan']} 🚀 Working Time : {COLORS['green']}{hours}h {COLORS['yellow']}{minutes}m {COLORS['reset']}{seconds}s 🚀{COLORS['reset']}")
         print(f"{COLORS['bold']}{COLORS['reset']}")
         
         
