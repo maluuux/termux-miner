@@ -173,7 +173,15 @@ class VrscCpuMinerMonitor:
             return psutil.cpu_percent(interval=1)
         except:
             return 0  # คืนค่า 0 หากตรวจสอบไม่ได้  
-        
+        # ตรวจสอบและแสดงผล % CPU
+        cpu_usage = self.get_cpu_usage()        
+        # แสดงผลแบบที่ทำงานได้แน่นอน
+        if cpu_usage < 50:
+            cpu_color = COLORS['green']
+        elif cpu_usage < 80:
+            cpu_color = COLORS['yellow']
+        else:
+            cpu_color = COLORS['red'] 
         
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
@@ -196,15 +204,7 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
-        # ตรวจสอบและแสดงผล % CPU
-        cpu_usage = self.get_cpu_usage()        
-        # แสดงผลแบบที่ทำงานได้แน่นอน
-        if cpu_usage < 50:
-            cpu_color = COLORS['green']
-        elif cpu_usage < 80:
-            cpu_color = COLORS['yellow']
-        else:
-            cpu_color = COLORS['red'] 
+        
         print(f"  CPU Usage: {cpu_color}{cpu_usage}%{COLORS['reset']}")
         
         # ส่วนรันไทม์
