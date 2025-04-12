@@ -162,21 +162,16 @@ class VrscCpuMinerMonitor:
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        print("-" * 60)
+        print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}👤 ข้อมูลผู้ขุด:{COLORS['reset']}")
-        print(f"  ที่อยู่กระเป๋า: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
-        print(f"  ชื่อ Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
-        
-        # ส่วนการตั้งค่าการขุด
-        print(f"\n{COLORS['bold']}⚙️ การตั้งค่า:{COLORS['reset']}")
+        print(f"{COLORS['bold']}🛠️Show settings🛠️{COLORS['reset']}")
+        print(f"  Wallet: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
+        print(f"  Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Pools:")
-        for i, pool in enumerate(self.config['pools'], 1):
-            print(f"    {i}. {COLORS['blue']}{pool}{COLORS['reset']}")
+        print(f"  Pools:")(f" "){i}. {COLORS['blue']}{pool}{COLORS['reset']}")
         
-        print("-" * 60)
+        print("-" * 0)
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
@@ -200,7 +195,6 @@ class VrscCpuMinerMonitor:
         # วิธีที่ 1: ใช้ค่าจาก miner output
         if 'difficulty' in miner_data:
             current_diff = miner_data['difficulty']
-            print(f"DEBUG: Using current difficulty from output")  # Debug message
         
         # วิธีที่ 2: คำนวณจาก hashrate และ shares (หากมีข้อมูล)
         elif 'hashrate' in miner_data and 'accepted' in miner_data and miner_data['accepted'] > 0:
@@ -208,12 +202,10 @@ class VrscCpuMinerMonitor:
                 current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
                 print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
             except Exception as e:
-                print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
         
         # วิธีที่ 3: ใช้ค่าล่าสุดที่เก็บไว้ (หากยังไม่เกิน 5 นาที)
         elif self.last_difficulty is not None and (time.time() - (self.last_update_time or 0)) < 300:
             current_diff = self.last_difficulty
-            print(f"DEBUG: Using last known difficulty")  # Debug message
         
         # แสดงผล
         if current_diff is not None:
