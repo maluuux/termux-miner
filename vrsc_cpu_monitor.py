@@ -101,10 +101,8 @@ class VrscCpuMinerMonitor:
                     results['difficulty'] = float(match.group(1))
                     self.last_difficulty = results['difficulty']
                     self.last_update_time = time.time()
-                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
                     break
                 except (ValueError, IndexError) as e:
-                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
         
         # หาค่าอื่นๆ
