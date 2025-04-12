@@ -173,11 +173,11 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['orange_text']}{COLORS['white_bg']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
-        print(f"  {COLORS['bold']}{COLORS['purple']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
-        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
-        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']} === ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
+        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
         
         print("-" * 0)
         
