@@ -164,7 +164,9 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
         
         # ส่วนหัว
+        
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
+        print("-" * 20)
         print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         print("-" * 20)
         
