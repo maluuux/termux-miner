@@ -228,7 +228,7 @@ class VrscCpuMinerMonitor:
         if 'block' in miner_data:
             print(f"  บล็อกที่พบ: {COLORS['cyan']}{miner_data['block']}{COLORS['reset']}")
         
-        print("-" * 60)
+        print("-" * 0)
         
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
