@@ -14,19 +14,17 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
-
+        
     def get_cpu_info(self):
     """ตรวจสอบการใช้งาน CPU"""
     # ตรวจสอบ % การใช้ CPU
-    cpu_percent = psutil.cpu_percent(interval=1)
-    
+        cpu_percent = psutil.cpu_percent(interval=1)  
     # ตรวจสอบอุณหภูมิ (ถ้าได้)
-    try:
+          try:
         cpu_temp = psutil.sensors_temperatures()['cpu_thermal'][0].current
-    except:
-        cpu_temp = "N/A"
-    
-    return cpu_percent, cpu_temp
+        except:
+        cpu_temp = "N/A"  
+        return cpu_percent, cpu_temp
         
     def load_config(self):
         """โหลดการตั้งค่าจากไฟล์ config"""
