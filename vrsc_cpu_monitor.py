@@ -167,26 +167,14 @@ class VrscCpuMinerMonitor:
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
 
-        def animated_verus():
-        colors = ["\033[36m", "\033[35m", "\033[34m", "\033[33m"]
-    
-        verus_art = [
-        "██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ ",
-        "██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗",
-        "██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝",
-        "╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗",
-        " ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║",
-        "  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝"
-        ]
+         print(f"  {COLORS['brown']}██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ {COLORS['reset']}"),
+         print(f"  {COLORS['brown']}██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
+         print(f"  {COLORS['brown']}██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝{COLORS['reset']}"),
+         print(f"  {COLORS['brown']}╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
+         print(f"  {COLORS['brown']} ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║{COLORS['reset']}"),
+         print(f"  {COLORS['brown']}  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝{COLORS['reset']}")
 
-        for i in range(10):  # วนลูป 10 รอบ
-        color = colors[i % len(colors)]
-        for line in verus_art:
-            print(f"{color}{line}")
-        time.sleep(0.5)
-        sys.stdout.write("\033[F"*len(verus_art))  # เคอร์เซอร์ขึ้นบรรทัดบน
-
-        animated_verus()
+      
         
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
