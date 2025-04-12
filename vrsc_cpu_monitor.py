@@ -167,7 +167,7 @@ class VrscCpuMinerMonitor:
             'orange_text':'\033[38;5;208m'
         }
 
-        def get_cpu_usage(self):
+    def get_cpu_usage(self):
         """ตรวจสอบ % การใช้ CPU แบบง่ายๆ"""
         try:
             return psutil.cpu_percent(interval=1)
