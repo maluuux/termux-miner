@@ -148,16 +148,6 @@ class VrscCpuMinerMonitor:
             return f"{hashrate/1000:.2f} kH/s"
         return f"{hashrate:.2f} H/s"
 
-    
-    # cpu ///
-    def get_cpu_usage(self):
-        try:
-            # ตรวจสอบ % CPU โดยเฉลี่ยใน 1 วินาที
-            return psutil.cpu_percent(interval=1)
-        except Exception as e:
-            print(f"ไม่สามารถตรวจสอบ CPU: {e}")
-            return 0  # คืนค่า 0 หากตรวจสอบไม่ได้
-
     def display_dashboard(self, miner_data):
         """แสดงผลข้อมูลการขุด"""
         COLORS = {
@@ -196,17 +186,15 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
 
-        # ตรวจสอบ % CPU
-        cpu_usage = self.get_cpu_usage()       
-        # เลือกสีตามระดับการใช้งาน
+       cpu_usage = self.get_cpu_usage()
+    # แสดงผล
         if cpu_usage < 50:
-            status = f"{COLORS['green']}กำลังทำงานปกติ{COLORS['reset']}"
+            status = f"{COLORS['green']}⚡ ปกติ{COLORS['reset']}"
         elif cpu_usage < 80:
-            status = f"{COLORS['yellow']}กำลังทำงานหนัก{COLORS['reset']}"
+            status = f"{COLORS['yellow']}⚠️ หนัก{COLORS['reset']}"
         else:
-            status = f"{COLORS['red']}กำลังทำงานหนักมาก!{COLORS['reset']}"
-        # แสดงผล
-        print(f"  การใช้งาน CPU: {cpu_usage}% ({status})")
+            status = f"{COLORS['red']}❌ หนักมาก!{COLORS['reset']}"
+        print(f"  CPU: {cpu_usage}% {status}")
         
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
