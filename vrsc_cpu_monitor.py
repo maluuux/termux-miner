@@ -169,7 +169,7 @@ class VrscCpuMinerMonitor:
         print(f"  Wallet: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Pools:")(f" "){i}. {COLORS['blue']}{pool}{COLORS['reset']}")
+        print(f"  Pools: {', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}")
         
         print("-" * 0)
         
