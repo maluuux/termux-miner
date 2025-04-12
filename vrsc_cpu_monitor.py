@@ -24,6 +24,7 @@ class VrscCpuMinerMonitor:
             'algo': 'ไม่ระบุ',
             'threads': 'ไม่ระบุ',
             'pools': [],
+            'url': 'ไม่ระบุ',
             'cpu-priority': 'ไม่ระบุ',
             'cpu-affinity': 'ไม่ระบุ',
             'retry-pause': 'ไม่ระบุ',
@@ -177,6 +178,7 @@ class VrscCpuMinerMonitor:
         print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['pass']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Pools{COLORS['reset']} : {COLORS['orange_text']}{self.config['url']}{COLORS['reset']}")
         
         print("-" * 0)
