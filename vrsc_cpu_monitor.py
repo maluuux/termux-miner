@@ -175,6 +175,15 @@ class VrscCpuMinerMonitor:
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}📊 สถานะการขุด:{COLORS['reset']}")
+
+        # ส่วนรันไทม์
+        runtime = int(time.time() - self.start_time)
+        hours = runtime // 3600
+        minutes = (runtime % 3600) // 60
+        seconds = runtime % 60
+        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['reset']}")
+        
         
         if 'connection' in miner_data:
             print(f"  เชื่อมต่อกับ: {COLORS['green']}{miner_data['connection']}{COLORS['reset']}")
@@ -235,13 +244,7 @@ class VrscCpuMinerMonitor:
         
         print("-" * 0)
         
-        # ส่วนรันไทม์
-        runtime = int(time.time() - self.start_time)
-        hours = runtime // 3600
-        minutes = (runtime % 3600) // 60
-        seconds = runtime % 60
-        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
-        print(f"{COLORS['bold']}{'='*0}{COLORS['reset']}")
+        
     
     def run(self):
         try:
