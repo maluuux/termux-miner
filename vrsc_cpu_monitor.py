@@ -211,7 +211,7 @@ class VrscCpuMinerMonitor:
             try:
                 current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
                 #print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
-            except Exception as e:
+            #except Exception as e:
                 #print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
         
         # วิธีที่ 3: ใช้ค่าล่าสุดที่เก็บไว้ (หากยังไม่เกิน 5 นาที)
