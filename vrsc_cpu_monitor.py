@@ -181,7 +181,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['bold']}⏳ เวลาการทำงาน: {hours}h {minutes}m {seconds}s{COLORS['reset']}")
+        print(f"{COLORS['cyan']} 🚀 Working Time : {COLORS['green']}{hours}h {COLORS['yellow']}{minutes}m {seconds}s 🚀{COLORS['reset']}")
         print(f"{COLORS['bold']}{COLORS['reset']}")
         
         
