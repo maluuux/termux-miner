@@ -166,19 +166,10 @@ class VrscCpuMinerMonitor:
   
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
-
-         print(f"{COLORS['bold']}██╗   ██╗███████╗██████╗ ██╗   ██╗██████╗ {COLORS['reset']}"),
-         print(f"{COLORS['bold']}██║   ██║██╔════╝██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
-         print(f"{COLORS['bold']}██║   ██║█████╗  ██████╔╝██║   ██║██████╔╝{COLORS['reset']}"),
-         print(f"{COLORS['bold']}╚██╗ ██╔╝██╔══╝  ██╔══██╗██║   ██║██╔══██╗{COLORS['reset']}"),
-         print(f"{COLORS['bold']} ╚████╔╝ ███████╗██║  ██║╚██████╔╝██║  ██║{COLORS['reset']}"),
-         print(f"{COLORS['bold']}  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝{COLORS['reset']}")
-
-      
         
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC CPU Mining Dashboard ==={COLORS['reset']}")
-        print(f"{COLORS['cyan']}⏱️ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== VRSC Miner ==={COLORS['reset']}")
+        print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         
         # ส่วนข้อมูลผู้ใช้และ Miner
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
