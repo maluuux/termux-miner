@@ -173,7 +173,7 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}{COLORS['purple']} === ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
         print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
