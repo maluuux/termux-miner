@@ -197,28 +197,6 @@ class VrscCpuMinerMonitor:
             else:
                 color = 'red'
             print(f"  {COLORS['bold']}Hashrate: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
-
-
-        # แสดงผล
-        if current_diff is not None:
-            diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 300000 else 'red'
-            print(f"  {COLORS['bold']}Difficulty: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
-            if 'difficulty' not in miner_data:
-                print(f"  {COLORS['yellow']}(อัปเดตข้อมูล... 🔄){COLORS['reset']}")
-        else:
-            print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
-        
-        if 'accepted' in miner_data or 'rejected' in miner_data:
-            accepted = miner_data.get('accepted', 0)
-            rejected = miner_data.get('rejected', 0)
-            total = accepted + rejected
-            ratio = (accepted / total * 100) if total > 0 else 100
-            
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
-                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
-                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-        
         
         # แสดง difficulty (วิธีใหม่)
         current_diff = None
@@ -240,6 +218,26 @@ class VrscCpuMinerMonitor:
         elif self.last_difficulty is not None and (time.time() - (self.last_update_time or 0)) < 300:
             current_diff = self.last_difficulty
            # print(f"DEBUG: Using last known difficulty")  # Debug message
+
+        # แสดงผล
+        if current_diff is not None:
+            diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 300000 else 'red'
+            print(f"  {COLORS['bold']}Difficulty: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            if 'difficulty' not in miner_data:
+                print(f"  {COLORS['yellow']}(อัปเดตข้อมูล... 🔄){COLORS['reset']}")
+        else:
+            print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
+        
+        if 'accepted' in miner_data or 'rejected' in miner_data:
+            accepted = miner_data.get('accepted', 0)
+            rejected = miner_data.get('rejected', 0)
+            total = accepted + rejected
+            ratio = (accepted / total * 100) if total > 0 else 100
+            
+            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
+                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
+                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
         
         
