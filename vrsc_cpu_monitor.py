@@ -153,7 +153,9 @@ class VrscCpuMinerMonitor:
             'green': '\033[92m', 'yellow': '\033[93m',
             'red': '\033[91m', 'blue': '\033[94m',
             'cyan': '\033[96m', 'purple': '\033[95m',
-            'reset': '\033[0m', 'bold': '\033[1m'
+            'reset': '\033[0m', 'bold': '\033[1m',
+            'redB':'\e[31mRed Background\e[0m',
+            'greenB':'\e[42mGreen Background\e[0m'
         }
         
         # ล้างหน้าจอ
@@ -199,8 +201,8 @@ class VrscCpuMinerMonitor:
             print(f"  {COLORS['bold']}Hashrate: {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['bold']}Shares: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
-                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
+            print(f"  {COLORS['bold']}Shares: {COLORS['greenB']}{accepted} ยอมรับ{COLORS['reset']} | "
+                  f"{COLORS['redB']}{rejected} ปฏิเสธ{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
         # แสดง difficulty (วิธีใหม่)
