@@ -205,7 +205,7 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}🚀🚀")
             
         
         # แสดง difficulty (วิธีใหม่)
@@ -245,9 +245,9 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"{COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
-            print(f"            {COLORS['green']}[Accepted!🚀 {accepted} {COLORS['reset']}"),
-            print(f"            {COLORS['red'  ]}[Rejected!💢 {rejected} {COLORS['reset']}")
+            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
+            print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}"),
+            print(f"  {COLORS['red'  ]}Rejected!! {rejected} {COLORS['reset']}")
         
         
         
