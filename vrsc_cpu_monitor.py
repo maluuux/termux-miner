@@ -1,4 +1,3 @@
-import psutil
 import subprocess
 import re
 import time
@@ -185,17 +184,6 @@ class VrscCpuMinerMonitor:
         
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡  Status Miner ⚡ ==={COLORS['reset']}")
-
-       cpu_usage = self.get_cpu_usage()
-    # แสดงผล
-        if cpu_usage < 50:
-            status = f"{COLORS['green']}⚡ ปกติ{COLORS['reset']}"
-        elif cpu_usage < 80:
-            status = f"{COLORS['yellow']}⚠️ หนัก{COLORS['reset']}"
-        else:
-            status = f"{COLORS['red']}❌ หนักมาก!{COLORS['reset']}"
-        print(f"  CPU: {cpu_usage}% {status}")
-        
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
