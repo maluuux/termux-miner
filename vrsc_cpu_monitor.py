@@ -159,7 +159,9 @@ class VrscCpuMinerMonitor:
             'yellow_bg': '\033[43m',
             'green_bg': '\033[42m',
             'orange_bg': '\033[48;5;208m',
-            'black_text': '\033[30m'
+            'black_text': '\033[30m',
+            'white_bg' = '\033[48;5;15m',
+            'orange_text' = '\033[38;5;208m'
         }
         
         # ล้างหน้าจอ
@@ -171,11 +173,11 @@ class VrscCpuMinerMonitor:
         print("-" * 0)
         
         # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}{COLORS['purple']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
-        print(f"  Wallet: {COLORS['blue']}{self.config['wallet_address']}{COLORS['reset']}")
-        print(f"  Miner: {COLORS['blue']}{self.config['miner_name']}{COLORS['reset']}")
-        print(f"  Threads: {COLORS['blue']}{self.config['threads']}{COLORS['reset']}")
-        print(f"  Pools: {COLORS['blue']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
+        print(f"{COLORS['orange_text']}{COLORS['white_bg']}=== ⛏️ Show settings ⛏️ ==={COLORS['reset']}")
+        print(f"  {COLORS['bold']}{COLORS['purple']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
+        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
+        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
+        print(f"  {COLORS['orange_text']}{COLORS['white_bg']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
         
         print("-" * 0)
         
@@ -187,7 +189,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']} 🚀 Working Time : {COLORS['green']}{hours}h {COLORS['yellow']}{minutes}m {COLORS['reset']}{seconds}s 🚀{COLORS['reset']}")
+        print(f"{COLORS['cyan']} 🕘 MinerRunTime : {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']}")
         print(f"{COLORS['bold']}{COLORS['reset']}")
         
         
@@ -228,7 +230,7 @@ class VrscCpuMinerMonitor:
 
         # แสดงผล
         if current_diff is not None:
-            diff_color = 'green' if current_diff < 100000 else 'yellow' if current_diff < 300000 else 'brown'
+            diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
             print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
             if 'difficulty' not in miner_data:
                 print(f"  {COLORS['yellow']}=== ⏳ ⏳ ⏳ ⏳ ⏳ ==={COLORS['reset']}")
@@ -242,8 +244,8 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']}: {COLORS['green']}{accepted} ยอมรับ{COLORS['reset']} | "
-                  f"{COLORS['red']}{rejected} ปฏิเสธ{COLORS['reset']} | "
+            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']}: {COLORS['green']}{accepted} yes!!🚀{COLORS['reset']} | "
+                  f"{COLORS['red']}{rejected} Booo!!💢{COLORS['reset']} | "
                   f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         
         
