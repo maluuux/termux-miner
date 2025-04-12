@@ -204,27 +204,27 @@ class VrscCpuMinerMonitor:
         # วิธีที่ 1: ใช้ค่าจาก miner output
         if 'difficulty' in miner_data:
             current_diff = miner_data['difficulty']
-            print(f"DEBUG: Using current difficulty from output")  # Debug message
+           #print(f"DEBUG: Using current difficulty from output")  # Debug message
         
         # วิธีที่ 2: คำนวณจาก hashrate และ shares (หากมีข้อมูล)
-        elif 'hashrate' in miner_data and 'accepted' in miner_data and miner_data['accepted'] > 0:
-            try:
-                current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
-                print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
-            except Exception as e:
-                print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
+        #elif 'hashrate' in miner_data and 'accepted' in miner_data and miner_data['accepted'] > 0:
+         #   try:
+          #      current_diff = miner_data['hashrate'] / miner_data['accepted']  # สูตรประมาณการณ์
+           #     print(f"DEBUG: Calculated difficulty from hashrate/shares")  # Debug message
+            #except Exception as e:
+             #   print(f"DEBUG: Difficulty calculation error - {e}")  # Debug message
         
         # วิธีที่ 3: ใช้ค่าล่าสุดที่เก็บไว้ (หากยังไม่เกิน 5 นาที)
         elif self.last_difficulty is not None and (time.time() - (self.last_update_time or 0)) < 300:
             current_diff = self.last_difficulty
-            #print(f"DEBUG: Using last known difficulty")  # Debug message
+           # print(f"DEBUG: Using last known difficulty")  # Debug message
         
         # แสดงผล
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100 else 'yellow' if current_diff < 300000 else 'red'
             print(f"  ความยาก: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
-            #if 'difficulty' not in miner_data:
-                #print(f"  {COLORS['yellow']}(ค่าประมาณ){COLORS['reset']}")
+            if 'difficulty' not in miner_data:
+               # print(f"  {COLORS['yellow']}(ค่าประมาณ){COLORS['reset']}")
         else:
             print(f"  ความยาก: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
         
