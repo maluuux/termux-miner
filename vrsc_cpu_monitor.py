@@ -75,8 +75,8 @@ class VrscCpuMinerMonitor:
                 re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
             ],
             'rejected': [
-                #re.compile(r'accepted\s*:\s*(\d+)/(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted : 7288/7337
-                re.compile(r'accepted\s*:\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
+                re.compile(r'accepted\s*:\s*(\d+)/(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted : 7288/7337
+                #re.compile(r'accepted\s*:\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
                 re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)  # สำหรับรูปแบบ yes!:10 n
             ],
             'difficulty': [
@@ -108,6 +108,26 @@ class VrscCpuMinerMonitor:
                     print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
 
+        # หาค่า accepted และ rejected
+    for pattern in patterns['accepted_rejected']:
+        match = pattern.search(line)
+        if match:
+            try:
+                if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':  # ถ้าเป็นรูปแบบ "accepted : 7288/7337"
+                    accepted = int(match.group(1))
+                    total = int(match.group(2))
+                    rejected = total - accepted
+                    results['accepted'] = accepted
+                    results['rejected'] = rejected
+                else:  # ถ้าเป็นรูปแบบอื่น เช่น "accepted=10 rejected=2" หรือ "yes!:10 no!:2"
+                    results['accepted'] = int(match.group(1))
+                    results['rejected'] = int(match.group(2))
+                break
+            except (ValueError, IndexError) as e:
+                print(f"DEBUG: Accepted/Rejected parse error - {e}")
+                continue
+
+        
         # หาค่าอื่นๆ
         for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
             if key in patterns:
