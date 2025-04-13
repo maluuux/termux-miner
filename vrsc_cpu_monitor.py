@@ -6,16 +6,14 @@ import json
 import os
 
 class VrscCpuMinerMonitor:
-def init(self):
-   self.hashrate_history = []
-   self.start_time = time.time()
-   self.max_history = 30
-   self.config = self.load_config()
-   self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
-   self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
-
-def load_config(self):  
-    """โหลดการตั้งค่าจากไฟล์ config"""  
+    def __init__(self):
+        self.hashrate_history = []
+        self.start_time = time.time()
+        self.max_history = 30
+        self.config = self.load_config()
+        self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
+        self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
+   def load_config(self): 
     default_config = {  
         'wallet_address': 'ไม่ระบุ',  
         'miner_name': 'ไม่ระบุ',  
@@ -86,10 +84,13 @@ def parse_miner_output(self, line):
             re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),  
             re.compile(r'\d+ diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)  
         ],  
-       'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE), 
+       'share': [
+            re.compile(r'(\d+)\s*/\s*(\d+)'),
+            re.compile(r'share:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE)
+        ],
         'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),  
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)  
-    }  
+        }  
 
     results = {}  
 
