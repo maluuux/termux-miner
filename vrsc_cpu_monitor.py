@@ -107,7 +107,7 @@ class VrscCpuMinerMonitor:
                     print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
         # หาค่า accepted/rejected ในรูปแบบ X/Y
-       share_match = patterns['share'].search(line)
+        share_match = patterns['share'].search(line)
         if share_match:
             try:
                 accepted = int(share_match.group(1))
