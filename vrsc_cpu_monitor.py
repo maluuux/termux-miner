@@ -107,7 +107,7 @@ class VrscCpuMinerMonitor:
                 continue
 
     # หาค่า share ratio (รูปแบบ X/Y)
-    share_match = patterns['share_ratio'].search(line)
+    share_match = patterns['share'].search(line)
     if share_match:
         try:
             accepted = int(share_match.group(1))
