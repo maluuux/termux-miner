@@ -7,12 +7,12 @@ import os
 
 class VrscCpuMinerMonitor:
 def init(self):
-self.hashrate_history = []
-self.start_time = time.time()
-self.max_history = 30
-self.config = self.load_config()
-self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
-self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
+   self.hashrate_history = []
+   self.start_time = time.time()
+   self.max_history = 30
+   self.config = self.load_config()
+   self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
+   self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
 
 def load_config(self):  
     """โหลดการตั้งค่าจากไฟล์ config"""  
