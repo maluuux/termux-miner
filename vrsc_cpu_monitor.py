@@ -254,10 +254,24 @@ class VrscCpuMinerMonitor:
             total = accepted + rejected
             ratio = (accepted / total * 100) if total > 0 else 100
 
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
-            print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}"),
-            print(f"  {COLORS['red'  ]}Rejected!! {rejected} {COLORS['reset']}")
+            # แทนที่ส่วนเดิมด้วยโค้ดนี้
+ratio = (accepted / total * 100) if total > 0 else 100
+
+# กำหนดสีตามอัตราส่วน
+ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+
+# ปรับรูปแบบการแสดงผลใหม่
+print(f"{COLORS['bold']}{COLORS['white_bg']}{COLORS['black_text']} 📊 SHARES STATUS 📊 {COLORS['reset']}")
+print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Success Rate{COLORS['reset']}: {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+print(f"  {COLORS['green_bg']}{COLORS['black_text']}Accepted{COLORS['reset']}: {COLORS['green']}{accepted:,}{COLORS['reset']} ✅")
+print(f"  {COLORS['red_bg']}{COLORS['black_text']}Rejected{COLORS['reset']}: {COLORS['red']}{rejected:,}{COLORS['reset']} ❌")
+print(f"  {COLORS['blue_bg']}{COLORS['black_text']}Total Submitted{COLORS['reset']}: {COLORS['cyan']}{total:,}{COLORS['reset']} 📤")
+
+# เพิ่มแถบแสดงความคืบหน้า (progress bar)
+progress_width = 20
+filled = int(ratio * progress_width / 100)
+progress_bar = f"{COLORS['green']}{'█' * filled}{COLORS['reset']}{COLORS['red']}{'░' * (progress_width - filled)}{COLORS['reset']}"
+print(f"  [{progress_bar}] {ratio:.1f}%")
        
     def run(self):
         try:
