@@ -63,62 +63,62 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
-        """Parse output จาก miner"""
-        patterns = {
-            'hashrate': [
-                re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
-                re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
-                re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
-            ],
-            'accepted': [
-                re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
-                re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
-            ],
-            'rejected': [
-                re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
-                re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
-            ],
-            'difficulty': [
-                re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
-            ],
-            'share_ratio': re.compile(r'(\d+)/(\d+)'),  # เพิ่ม pattern สำหรับรูปแบบ X/Y
-            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
-            'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
-        }
+    """Parse output จาก miner"""
+    patterns = {
+        'hashrate': [
+            re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
+            re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
+            re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
+        ],
+        'accepted': [
+            re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
+            re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
+        ],
+        'rejected': [
+            re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
+            re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
+        ],
+        'share_ratio': re.compile(r'(\d+)/(\d+)'),  # เพิ่ม pattern สำหรับรูปแบบ X/Y
+        'difficulty': [
+            re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+            re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+            re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+            re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+            re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+            re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
+        ],
+        'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
+        'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
+    }
 
-        results = {}
+    results = {}
 
-       # หาค่า difficulty ก่อน
-        for pattern in patterns['difficulty']:
-            match = pattern.search(line)
-            if match:
-                try:
-                    results['difficulty'] = float(match.group(1))
-                    self.last_difficulty = results['difficulty']
-                    self.last_update_time = time.time()
-                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
-                    break
-                except (ValueError, IndexError) as e:
-                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
-                    continue
-
-                # หาค่า accepted/rejected ในรูปแบบ X/Y
-        share_match = patterns['share_ratio'].search(line)
-        if share_match:
+    # หาค่า difficulty ก่อน
+    for pattern in patterns['difficulty']:
+        match = pattern.search(line)
+        if match:
             try:
-                accepted = int(share_match.group(1))
-                total = int(share_match.group(2))
-                results['accepted'] = accepted
-                results['rejected'] = total - accepted  # คำนวณ rejected จาก total - accepted
+                results['difficulty'] = float(match.group(1))  # ตรงนี้แก้ไขวงเล็บปิด
+                self.last_difficulty = results['difficulty']
+                self.last_update_time = time.time()
+                print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
+                break
             except (ValueError, IndexError) as e:
-                print(f"DEBUG: Share ratio parse error - {e}")
-        
-         # หาค่าอื่นๆ
+                print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
+                continue
+
+    # หาค่า share ratio (รูปแบบ X/Y)
+    share_match = patterns['share_ratio'].search(line)
+    if share_match:
+        try:
+            accepted = int(share_match.group(1))
+            total = int(share_match.group(2))
+            results['accepted'] = accepted
+            results['rejected'] = total - accepted  # คำนวณ rejected จาก total - accepted
+        except (ValueError, IndexError) as e:
+            print(f"DEBUG: Share ratio parse error - {e}")
+
+    # หาค่าอื่นๆ
     for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
         if key in patterns and key not in results:  # ตรวจสอบว่าไม่มีการตั้งค่าแล้วจาก share ratio
             if isinstance(patterns[key], list):
@@ -148,7 +148,7 @@ class VrscCpuMinerMonitor:
                     except:
                         pass
 
-        return results
+    return results
 
     def format_hashrate(self, hashrate):
         """จัดรูปแบบ hashrate"""
