@@ -92,29 +92,29 @@ class VrscCpuMinerMonitor:
         results = {}
 
        # หาค่า difficulty ก่อน
-        for pattern in patterns['difficulty']:
-            match = pattern.search(line)
-            if match:
-                try:
-                    results['difficulty'] = float(match.group(1))
-                    self.last_difficulty = results['difficulty']
-                    self.last_update_time = time.time()
-                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
-                    break
-                except (ValueError, IndexError) as e:
-                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
-                    continue
-
-         # หาค่า share ratio (รูปแบบ X/Y)
-        share_match = patterns['share_ratio'].search(line)
-        if share_match:
+    for pattern in patterns['difficulty']:
+        match = pattern.search(line)
+        if match:
             try:
-                accepted = int(share_match.group(1))
-                total = int(share_match.group(2))
-                results['accepted'] = accepted
-                results['rejected'] = total - accepted  # คำนวณ rejected จาก total - accepted
+                results['difficulty'] = float(match.group(1))  # ตรงนี้แก้ไขวงเล็บปิด
+                self.last_difficulty = results['difficulty']
+                self.last_update_time = time.time()
+                print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
+                break
             except (ValueError, IndexError) as e:
-                print(f"DEBUG: Share ratio parse error - {e}")
+                print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
+                continue
+
+    # หาค่า share ratio (รูปแบบ X/Y)
+    share_match = patterns['share_ratio'].search(line)
+    if share_match:
+        try:
+            accepted = int(share_match.group(1))
+            total = int(share_match.group(2))
+            results['accepted'] = accepted
+            results['rejected'] = total - accepted  # คำนวณ rejected จาก total - accepted
+        except (ValueError, IndexError) as e:
+            print(f"DEBUG: Share ratio parse error - {e}")
 
          # หาค่าอื่นๆ
     for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
