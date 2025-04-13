@@ -15,7 +15,6 @@ class VrscCpuMinerMonitor:
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
 
     def load_config(self):
-        """โหลดการตั้งค่าจากไฟล์ config"""
         default_config = {
             'wallet_address': 'ไม่ระบุ',
             'miner_name': 'ไม่ระบุ',
