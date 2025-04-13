@@ -14,70 +14,19 @@ class VrscCpuMinerMonitor:
         self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
 
-    def load_config(self):
-        """โหลดการตั้งค่าจากไฟล์ config"""
-        default_config = {
-            'wallet_address': 'ไม่ระบุ',
-            'miner_name': 'ไม่ระบุ',
-            'user': 'ไม่ระบุ',
-            'pass': 'ไม่ระบุ',
-            'algo': 'ไม่ระบุ',
-            'threads': 'ไม่ระบุ',
-            'pools': [],
-            'cpu-priority': 'ไม่ระบุ',
-            'cpu-affinity': 'ไม่ระบุ',
-            'retry-pause': 'ไม่ระบุ',
-            'api-allow': 'ไม่ระบุ',
-            'api-bind': 'ไม่ระบุ'
-        }
-
-        try:
-            config_paths = [
-                'config.json',
-                '/data/data/com.termux/files/home/config.json',
-                '/data/data/com.termux/files/usr/etc/verus/config.json'
-            ]
-
-            for path in config_paths:
-                if os.path.exists(path):
-                    with open(path, 'r') as f:
-                        loaded_config = json.load(f)
-
-                        if 'wallet_address' not in loaded_config and 'user' in loaded_config:
-                            user_parts = loaded_config['user'].split('.')
-                            if len(user_parts) > 0:
-                                loaded_config['wallet_address'] = user_parts[0]
-                            if len(user_parts) > 1:
-                                loaded_config['miner_name'] = user_parts[1]
-
-                        if 'pools' in loaded_config and isinstance(loaded_config['pools'], list):
-                            if len(loaded_config['pools']) > 0 and isinstance(loaded_config['pools'][0], dict):
-                                loaded_config['pools'] = [pool['url'] for pool in loaded_config['pools'] if 'url' in pool]
-
-                        default_config.update(loaded_config)
-                    break
-
-        except Exception as e:
-            print(f"ไม่สามารถโหลด config ได้: {e}")
-
-        return default_config
-
     def parse_miner_output(self, line):
+    """Parse output จาก miner"""
     patterns = {
         'hashrate': [
             re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
             re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
             re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
         ],
-        'accepted': [
-            re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
-            re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
+        'accepted_rejected': [
+            re.compile(r'accepted\s*:\s*(\d+)/(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted : 7288/7337
+            re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
+            re.compile(r'yes!:\s*(\d+)\s*booooo:\s*(\d+)', re.IGNORECASE)  # สำหรับรูปแบบ yes!:10 no!:2
         ],
-        'rejected': [
-            re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
-            re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
-        ],
-        'share': re.compile(r'(\d+)/(\d+)'),  # เพิ่ม pattern สำหรับรูปแบบ X/Y
         'difficulty': [
             re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
             re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
@@ -86,6 +35,7 @@ class VrscCpuMinerMonitor:
             re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
             re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
         ],
+        'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
         'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
     }
@@ -97,7 +47,7 @@ class VrscCpuMinerMonitor:
         match = pattern.search(line)
         if match:
             try:
-                results['difficulty'] = float(match.group(1))  # ตรงนี้แก้ไขวงเล็บปิด
+                results['difficulty'] = float(match.group(1))
                 self.last_difficulty = results['difficulty']
                 self.last_update_time = time.time()
                 print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
@@ -106,20 +56,30 @@ class VrscCpuMinerMonitor:
                 print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                 continue
 
-    # หาค่า share ratio (รูปแบบ X/Y)
-    share_match = patterns['share'].search(line)
-    if share_match:
-        try:
-            accepted = int(share_match.group(1))
-            total = int(share_match.group(2))
-            results['accepted'] = accepted
-            results['rejected'] = total - accepted  # คำนวณ rejected จาก total - accepted
-        except (ValueError, IndexError) as e:
-            print(f"DEBUG: Share ratio parse error - {e}")
+    # หาค่า accepted และ rejected
+    for pattern in patterns['accepted_rejected']:
+        match = pattern.search(line)
+        if match:
+            try:
+                if len(match.groups()) == 2:
+                    # สำหรับรูปแบบ accepted : 7288/7337
+                    accepted = int(match.group(1))
+                    total = int(match.group(2))
+                    rejected = total - accepted
+                    results['accepted'] = accepted
+                    results['rejected'] = rejected
+                elif len(match.groups()) >= 2:
+                    # สำหรับรูปแบบ accepted=10 rejected=2
+                    results['accepted'] = int(match.group(1))
+                    results['rejected'] = int(match.group(2))
+                break
+            except (ValueError, IndexError) as e:
+                print(f"DEBUG: Accepted/Rejected parse error - {e}")
+                continue
 
     # หาค่าอื่นๆ
-    for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
-        if key in patterns and key not in results:  # ตรวจสอบว่าไม่มีการตั้งค่าแล้วจาก share ratio
+    for key in ['hashrate', 'block', 'connection']:
+        if key in patterns:
             if isinstance(patterns[key], list):
                 for pattern in patterns[key]:
                     match = pattern.search(line)
