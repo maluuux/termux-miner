@@ -106,7 +106,17 @@ class VrscCpuMinerMonitor:
                 except (ValueError, IndexError) as e:
                     print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
-
+        # หาค่า accepted/rejected ในรูปแบบ X/Y
+        share_match = patterns['share'].search(line)
+            if share_match:
+                try:
+                    accepted = int(share_match.group(1))
+                    total = int(share_match.group(2))
+                    rejected = total - accepted
+                    results['accepted'] = accepted
+                    results['rejected'] = rejected
+                except (ValueError, IndexError):
+                    pass
         # หาค่าอื่นๆ
         for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
             if key in patterns:
