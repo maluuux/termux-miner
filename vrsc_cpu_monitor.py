@@ -89,7 +89,6 @@ class VrscCpuMinerMonitor:
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
     }
 
-
         results = {}
 
        # หาค่า difficulty ก่อน
