@@ -14,7 +14,7 @@ class VrscCpuMinerMonitor:
         self.last_difficulty = None  # เก็บค่า difficulty ล่าสุด
         self.last_update_time = None  # เก็บเวลาอัพเดทล่าสุด
    def load_config(self): 
-    default_config = {  
+        default_config = {  
         'wallet_address': 'ไม่ระบุ',  
         'miner_name': 'ไม่ระบุ',  
         'user': 'ไม่ระบุ',  
@@ -27,7 +27,7 @@ class VrscCpuMinerMonitor:
         'retry-pause': 'ไม่ระบุ',  
         'api-allow': 'ไม่ระบุ',  
         'api-bind': 'ไม่ระบุ'  
-    }  
+    }
 
     try:  
         config_paths = [  
