@@ -91,21 +91,21 @@ class VrscCpuMinerMonitor:
 
         results = {}
 
-       # หาค่า difficulty ก่อน
-        for pattern in patterns['difficulty']:
-            match = pattern.search(line)
-            if match:
-                try:
-                    results['difficulty'] = float(match.group(1))
-                    self.last_difficulty = results['difficulty']
-                    self.last_update_time = time.time()
-                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
-                    break
-                except (ValueError, IndexError) as e:
-                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
-                    continue
+    # หาค่า difficulty ก่อน
+    for pattern in patterns['difficulty']:
+        match = pattern.search(line)
+        if match:
+            try:
+                results['difficulty'] = float(match.group(1))
+                self.last_difficulty = results['difficulty']
+                self.last_update_time = time.time()
+                print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
+                break
+            except (ValueError, IndexError) as e:
+                print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
+                continue
 
-                # หาค่า accepted และ rejected
+    # หาค่า accepted และ rejected
     for pattern in patterns['accepted_rejected']:
         match = pattern.search(line)
         if match:
@@ -126,38 +126,37 @@ class VrscCpuMinerMonitor:
                 print(f"DEBUG: Accepted/Rejected parse error - {e}")
                 continue
 
-        # หาค่าอื่นๆ
-        for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
-            if key in patterns:
-                if isinstance(patterns[key], list):
-                    for pattern in patterns[key]:
-                        match = pattern.search(line)
-                        if match:
-                            try:
-                                if key == 'hashrate':
-                                    value = float(match.group(1))
-                                    unit = match.group(2).upper()
-                                    conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
-                                    value *= conversions.get(unit, 1)
-                                    results[key] = value
-                                    self.hashrate_history.append(value)
-                                    if len(self.hashrate_history) > self.max_history:
-                                        self.hashrate_history.pop(0)
-                                else:
-                                    results[key] = int(match.group(1))
-                                break
-                            except:
-                                continue
-                else:
-                    match = patterns[key].search(line)
+    # หาค่าอื่นๆ
+    for key in ['hashrate', 'block', 'connection']:
+        if key in patterns:
+            if isinstance(patterns[key], list):
+                for pattern in patterns[key]:
+                    match = pattern.search(line)
                     if match:
                         try:
-                            results[key] = match.group(1).strip()
+                            if key == 'hashrate':
+                                value = float(match.group(1))
+                                unit = match.group(2).upper()
+                                conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
+                                value *= conversions.get(unit, 1)
+                                results[key] = value
+                                self.hashrate_history.append(value)
+                                if len(self.hashrate_history) > self.max_history:
+                                    self.hashrate_history.pop(0)
+                            else:
+                                results[key] = int(match.group(1))
+                            break
                         except:
-                            pass
+                            continue
+            else:
+                match = patterns[key].search(line)
+                if match:
+                    try:
+                        results[key] = match.group(1).strip()
+                    except:
+                        pass
 
-        return results
-
+    return results
     def format_hashrate(self, hashrate):
         """จัดรูปแบบ hashrate"""
         if hashrate >= 1000000:
