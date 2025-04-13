@@ -86,10 +86,7 @@ def parse_miner_output(self, line):
             re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),  
             re.compile(r'\d+ diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)  
         ],  
-        'share': [
-            re.compile(r'(\d+)\s*/\s*(\d+)'),
-            re.compile(r'share:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE)
-        ],
+       'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE), 
         'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),  
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)  
     }  
@@ -110,17 +107,17 @@ def parse_miner_output(self, line):
                 print(f"DEBUG: Difficulty parse error - {e}")  # Debug message  
                 continue  
         # แยกค่า accepted / rejected จากรูปแบบ "1975/1990"
-  for pattern in patterns['share']:
-      match = pattern.search(line)
-        if match:
-          try:
+    for pattern in patterns['share']:
+        match = pattern.search(line)
+          if match:
+            try:
               accepted = int(match.group(1))
               total = int(match.group(2))
               rejected = total - accepted
               results['accepted'] = accepted
               results['rejected'] = rejected
               break
-        except Exception as e:
+           except Exception as e:
             print(f"DEBUG: Error parsing share - {e}")
             continue
 
