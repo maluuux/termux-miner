@@ -121,7 +121,7 @@ class VrscCpuMinerMonitor:
                     results['rejected'] = rejected
                 else:  # ถ้าเป็นรูปแบบอื่น เช่น "accepted=10 rejected=2" หรือ "yes!:10 no!:2"
                     results['accepted'] = int(match.group(1))
-                    results['rejected'] = int(match.group(2))
+                    results['rejected'] = int(match.group(2)) - {results['rejected']}
                 break
             except (ValueError, IndexError) as e:
                 print(f"DEBUG: Accepted/Rejected parse error - {e}")
