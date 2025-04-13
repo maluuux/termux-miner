@@ -86,7 +86,10 @@ def parse_miner_output(self, line):
             re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),  
             re.compile(r'\d+ diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)  
         ],  
-        'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),  
+        'share': [
+            re.compile(r'(\d+)\s*/\s*(\d+)'),
+            re.compile(r'share:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE)
+        ]
         'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),  
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)  
     }  
@@ -106,6 +109,20 @@ def parse_miner_output(self, line):
             except (ValueError, IndexError) as e:  
                 print(f"DEBUG: Difficulty parse error - {e}")  # Debug message  
                 continue  
+        # แยกค่า accepted / rejected จากรูปแบบ "1975/1990"
+  for pattern in patterns['share']:
+      match = pattern.search(line)
+        if match:
+          try:
+              accepted = int(match.group(1))
+              total = int(match.group(2))
+              rejected = total - accepted
+              results['accepted'] = accepted
+              results['rejected'] = rejected
+              break
+        except Exception as e:
+            print(f"DEBUG: Error parsing share - {e}")
+            continue
 
     # หาค่าอื่นๆ  
     for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:  
@@ -236,16 +253,16 @@ def display_dashboard(self, miner_data):
     else:  
         print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")  
 
-    if 'accepted' in miner_data or 'rejected' in miner_data:  
-        accepted = miner_data.get('accepted', 0)  
-        rejected = miner_data.get('rejected', 0)  
-        total = accepted + rejected  
-        ratio = (accepted / total * 100) if total > 0 else 100  
+    if 'accepted' in miner_data or 'rejected' in miner_data:
+    accepted = miner_data.get('accepted', 0)
+    rejected = miner_data.get('rejected', 0)
+    total = accepted + rejected
+    ratio = (accepted / total * 100) if total > 0 else 100
 
-        ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'  
-        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),  
-        print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}"),  
-        print(f"  {COLORS['red'  ]}Rejected!! {rejected} {COLORS['reset']}")  
+    ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+    print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+    print(f"    {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
+    print(f"    {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")  
 
 def run(self):  
     try:  
