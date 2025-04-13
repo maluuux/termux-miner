@@ -62,7 +62,6 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
-    """Parse output จาก miner"""
     patterns = {
         'hashrate': [
             re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
