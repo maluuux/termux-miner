@@ -74,10 +74,8 @@ class VrscCpuMinerMonitor:
                 re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
                 re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
             ],
-            'rejected': [
-                re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
-                re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
-            ],
+            'accepted_rejected':re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
+        
             'difficulty': [
                 re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
                 re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
@@ -106,6 +104,27 @@ class VrscCpuMinerMonitor:
                 except (ValueError, IndexError) as e:
                     print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
+
+                # หาค่า accepted และ rejected
+    for pattern in patterns['accepted_rejected']:
+        match = pattern.search(line)
+        if match:
+            try:
+                if len(match.groups()) == 2:
+                    # สำหรับรูปแบบ accepted : 7288/7337
+                    accepted = int(match.group(1))
+                    total = int(match.group(2))
+                    rejected = total - accepted
+                    results['accepted'] = accepted
+                    results['rejected'] = rejected
+                elif len(match.groups()) >= 2:
+                    # สำหรับรูปแบบ accepted=10 rejected=2
+                    results['accepted'] = int(match.group(1))
+                    results['rejected'] = int(match.group(2))
+                break
+            except (ValueError, IndexError) as e:
+                print(f"DEBUG: Accepted/Rejected parse error - {e}")
+                continue
 
         # หาค่าอื่นๆ
         for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
