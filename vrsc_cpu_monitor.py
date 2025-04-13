@@ -74,7 +74,7 @@ class VrscCpuMinerMonitor:
                 re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
                 re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
             ],
-            'accepted_rejected': [
+            'rejected': [
                 re.compile(r'accepted\s*:\s*(\d+)/(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted : 7288/7337
                 re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
                 re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)  # สำหรับรูปแบบ yes!:10 n
