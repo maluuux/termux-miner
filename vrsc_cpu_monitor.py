@@ -74,8 +74,11 @@ class VrscCpuMinerMonitor:
                 re.compile(r'accepted:\s*(\d+)', re.IGNORECASE),
                 re.compile(r'yes!:\s*(\d+)', re.IGNORECASE)
             ],
-            'accepted_rejected':re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
-        
+            'accepted_rejected': [
+            re.compile(r'accepted\s*:\s*(\d+)/(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted : 7288/7337
+            re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),  # สำหรับรูปแบบ accepted=10 rejected=2
+            re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)  # สำหรับรูปแบบ yes!:10 n
+            ],
             'difficulty': [
                 re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
                 re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
@@ -91,72 +94,52 @@ class VrscCpuMinerMonitor:
 
         results = {}
 
-    # หาค่า difficulty ก่อน
-    for pattern in patterns['difficulty']:
-        match = pattern.search(line)
-        if match:
-            try:
-                results['difficulty'] = float(match.group(1))
-                self.last_difficulty = results['difficulty']
-                self.last_update_time = time.time()
-                print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
-                break
-            except (ValueError, IndexError) as e:
-                print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
-                continue
+       # หาค่า difficulty ก่อน
+        for pattern in patterns['difficulty']:
+            match = pattern.search(line)
+            if match:
+                try:
+                    results['difficulty'] = float(match.group(1))
+                    self.last_difficulty = results['difficulty']
+                    self.last_update_time = time.time()
+                    print(f"DEBUG: Found difficulty - {results['difficulty']}")  # Debug message
+                    break
+                except (ValueError, IndexError) as e:
+                    print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
+                    continue
 
-    # หาค่า accepted และ rejected
-    for pattern in patterns['accepted_rejected']:
-        match = pattern.search(line)
-        if match:
-            try:
-                if len(match.groups()) == 2:
-                    # สำหรับรูปแบบ accepted : 7288/7337
-                    accepted = int(match.group(1))
-                    total = int(match.group(2))
-                    rejected = total - accepted
-                    results['accepted'] = accepted
-                    results['rejected'] = rejected
-                elif len(match.groups()) >= 2:
-                    # สำหรับรูปแบบ accepted=10 rejected=2
-                    results['accepted'] = int(match.group(1))
-                    results['rejected'] = int(match.group(2))
-                break
-            except (ValueError, IndexError) as e:
-                print(f"DEBUG: Accepted/Rejected parse error - {e}")
-                continue
-
-    # หาค่าอื่นๆ
-    for key in ['hashrate', 'block', 'connection']:
-        if key in patterns:
-            if isinstance(patterns[key], list):
-                for pattern in patterns[key]:
-                    match = pattern.search(line)
+        # หาค่าอื่นๆ
+        for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
+            if key in patterns:
+                if isinstance(patterns[key], list):
+                    for pattern in patterns[key]:
+                        match = pattern.search(line)
+                        if match:
+                            try:
+                                if key == 'hashrate':
+                                    value = float(match.group(1))
+                                    unit = match.group(2).upper()
+                                    conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
+                                    value *= conversions.get(unit, 1)
+                                    results[key] = value
+                                    self.hashrate_history.append(value)
+                                    if len(self.hashrate_history) > self.max_history:
+                                        self.hashrate_history.pop(0)
+                                else:
+                                    results[key] = int(match.group(1))
+                                break
+                            except:
+                                continue
+                else:
+                    match = patterns[key].search(line)
                     if match:
                         try:
-                            if key == 'hashrate':
-                                value = float(match.group(1))
-                                unit = match.group(2).upper()
-                                conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
-                                value *= conversions.get(unit, 1)
-                                results[key] = value
-                                self.hashrate_history.append(value)
-                                if len(self.hashrate_history) > self.max_history:
-                                    self.hashrate_history.pop(0)
-                            else:
-                                results[key] = int(match.group(1))
-                            break
+                            results[key] = match.group(1).strip()
                         except:
-                            continue
-            else:
-                match = patterns[key].search(line)
-                if match:
-                    try:
-                        results[key] = match.group(1).strip()
-                    except:
-                        pass
+                            pass
 
-    return results
+        return results
+
     def format_hashrate(self, hashrate):
         """จัดรูปแบบ hashrate"""
         if hashrate >= 1000000:
