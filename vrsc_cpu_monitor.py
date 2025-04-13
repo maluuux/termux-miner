@@ -89,7 +89,7 @@ def parse_miner_output(self, line):
         'share': [
             re.compile(r'(\d+)\s*/\s*(\d+)'),
             re.compile(r'share:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE)
-        ]
+        ],
         'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),  
         'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)  
     }  
