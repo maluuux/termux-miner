@@ -76,7 +76,7 @@ class VrscCpuMinerMonitor:
             re.compile(r'rejected:\s*(\d+)', re.IGNORECASE),
             re.compile(r'no!:\s*(\d+)', re.IGNORECASE)
         ],
-        'share_ratio': re.compile(r'(\d+)/(\d+)'),  # เพิ่ม pattern สำหรับรูปแบบ X/Y
+        'share': re.compile(r'(\d+)/(\d+)'),  # เพิ่ม pattern สำหรับรูปแบบ X/Y
         'difficulty': [
             re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
             re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
