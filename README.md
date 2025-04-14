@@ -7,7 +7,8 @@ yes | pkg update -y
 yes | pkg upgrade -y
 yes | pkg install libjansson wget nano -y
 yes | pkg install python -y
-pip install psutil
+pip install --upgrade pip wheel
+pip install psutil --no-binary psutil
 mkdir ccminer && cd ccminer
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
