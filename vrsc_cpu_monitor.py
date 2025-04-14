@@ -94,6 +94,24 @@ class VrscCpuMinerMonitor:
 
         results = {}
 
+        for pattern in patterns['accepted_rejected']:
+    match = pattern.search(line)
+    if match:
+        try:
+            if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':
+                # รูปแบบ "accepted : 7288/7337"
+                accepted = int(match.group(1))
+                total = int(match.group(2))
+                results['accepted'] = accepted
+                results['rejected'] = total - accepted  # คำนวณ Rejected
+            else:
+                # รูปแบบอื่นที่ให้ค่า Rejected โดยตรง
+                results['accepted'] = int(match.group(1))
+                results['rejected'] = int(match.group(2))
+            break
+        except (ValueError, IndexError) as e:
+            print(f"DEBUG: Error parsing accepted/rejected - {e}")
+
        # หาค่า difficulty ก่อน
         for pattern in patterns['difficulty']:
             match = pattern.search(line)
@@ -108,26 +126,7 @@ class VrscCpuMinerMonitor:
                     print(f"DEBUG: Difficulty parse error - {e}")  # Debug message
                     continue
 
-        # หาค่า accepted และ rejected
-    for pattern in patterns['rejected']:
-        match = pattern.search(line)
-        if match:
-            try:
-                if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':  # ถ้าเป็นรูปแบบ "accepted : 7288/7337"
-                    accepted = int(match.group(1))
-                    total = int(match.group(2))
-                    rejected = total - accepted
-                    results['accepted'] = accepted
-                    results['rejected'] = rejected
-                else:  # ถ้าเป็นรูปแบบอื่น เช่น "accepted=10 rejected=2" หรือ "yes!:10 no!:2"
-                    results['accepted'] = int(match.group(1))
-                    results['rejected'] = int(match.group(2)) - {results['rejected']}
-                break
-            except (ValueError, IndexError) as e:
-                print(f"DEBUG: Accepted/Rejected parse error - {e}")
-                continue
-
-        
+    
         # หาค่าอื่นๆ
         for key in ['hashrate', 'accepted', 'rejected', 'block', 'connection']:
             if key in patterns:
