@@ -94,7 +94,7 @@ class VrscCpuMinerMonitor:
 
         results = {}
 
-        for pattern in patterns['accepted_rejected']:
+        for pattern in patterns['rejected']:
         match = pattern.search(line)
         if match:
             try:
