@@ -94,7 +94,7 @@ class VrscCpuMinerMonitor:
 
         results = {}
 
-        for pattern in patterns['accepted_rejected']:
+        for pattern in patterns['rejected']:
     match = pattern.search(line)
     if match:
         try:
@@ -247,26 +247,31 @@ class VrscCpuMinerMonitor:
             current_diff = self.last_difficulty
            # print(f"DEBUG: Using last known difficulty")  # Debug message
 
-        # แสดงผล
-        if current_diff is not None:
-            diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
-            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
-            if 'difficulty' not in miner_data:
-                print(f"  {COLORS['orange_bg']}{COLORS['black_text']}                   {COLORS['reset']}👻")
-        else:
-            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
+        # แสดงผล Difficulty (เหมือนเดิม)
+if current_diff is not None:
+    diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
+    print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+    if 'difficulty' not in miner_data:
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}                   {COLORS['reset']}👻")
+else:
+    print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}ไม่พบข้อมูล{COLORS['reset']}")
 
-        if 'accepted' in miner_data or 'rejected' in miner_data:
-            accepted = miner_data.get('accepted', 0)
-            rejected = miner_data.get('rejected', 0)
-            total = accepted + rejected
-            ratio = (accepted / total * 100) if total > 0 else 100
-
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}"),
-            print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}"),
-            print(f"  {COLORS['red'  ]}Rejected!! {rejected} {COLORS['reset']}")
-
+# แสดงผล Shares/Accepted/Rejected (ส่วนที่แก้ไข)
+if 'accepted' in miner_data or 'rejected' in miner_data:
+    accepted = miner_data.get('accepted', 0)
+    rejected = miner_data.get('rejected', 0)
+    total = accepted + rejected
+    
+    # คำนวณอัตราส่วน (ratio) โดยป้องกันการหารด้วยศูนย์
+    ratio = (accepted / total * 100) if total > 0 else 100
+    
+    # กำหนดสีตามอัตราส่วน
+    ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+    
+    # แสดงผลแบบจัดเรียงให้สวยงาม
+    print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} : {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+    print(f"  ├─{COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
+    print(f"  └─{COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
     def run(self):
         try:
             process = subprocess.Popen(
