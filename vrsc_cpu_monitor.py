@@ -95,20 +95,20 @@ class VrscCpuMinerMonitor:
         results = {}
 
         for pattern in patterns['accepted_rejected']:
-    match = pattern.search(line)  # <-- ต้องเยื้องบรรทัดนี้ให้อยู่ในบล็อกของ for
-    if match:  # <-- เยื้องต่อเนื่องกัน
-        try:
-            if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':
-                accepted = int(match.group(1))
-                total = int(match.group(2))
-                results['accepted'] = accepted
-                results['rejected'] = total - accepted
-            else:
-                results['accepted'] = int(match.group(1))
-                results['rejected'] = int(match.group(2))
-            break
-        except (ValueError, IndexError) as e:
-            print(f"DEBUG: Error parsing accepted/rejected - {e}")
+        match = pattern.search(line)
+        if match:
+            try:
+                if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':
+                    accepted = int(match.group(1))
+                    total = int(match.group(2))
+                    results['accepted'] = accepted
+                    results['rejected'] = total - accepted
+                else:
+                    results['accepted'] = int(match.group(1))
+                    results['rejected'] = int(match.group(2))
+                break
+            except (ValueError, IndexError) as e:
+                print(f"DEBUG: Error parsing accepted/rejected - {e}")
 
        # หาค่า difficulty ก่อน
         for pattern in patterns['difficulty']:
