@@ -57,7 +57,7 @@ class VrscCpuMinerMonitor:
                         loaded_config = json.load(f)
 
                         wallet = loaded_config.get('wallet_address',
-                                                loaded_config.get('user', 'ไม่ระบุ'))
+                                                   loaded_config.get('user', 'ไม่ระบุ'))
                         if '.' in wallet:
                             base_wallet, miner_name = wallet.rsplit('.', 1)
                             loaded_config['base_wallet'] = base_wallet
@@ -66,12 +66,12 @@ class VrscCpuMinerMonitor:
                             loaded_config['base_wallet'] = wallet
 
                         if ('pools' in loaded_config and
-                            isinstance(loaded_config['pools'], list) and
-                            len(loaded_config['pools']) > 0):
+                                isinstance(loaded_config['pools'], list) and
+                                len(loaded_config['pools']) > 0):
                             first_pool = loaded_config['pools'][0]
                             if isinstance(first_pool, dict):
                                 pool_str = (f"{first_pool.get('name', 'ไม่มีชื่อ')} "
-                                          f"({first_pool.get('url', 'ไม่มีURL')})")
+                                            f"({first_pool.get('url', 'ไม่มีURL')})")
                                 loaded_config['pools'] = [pool_str]
                             else:
                                 loaded_config['pools'] = [str(first_pool)]
@@ -142,7 +142,7 @@ class VrscCpuMinerMonitor:
                     else:
                         accepted = int(match.group(1))
                         rejected = int(match.group(2))
-                    
+
                     if accepted != self.miner_data['accepted'] or rejected != self.miner_data['rejected']:
                         self.miner_data['accepted'] = accepted
                         self.miner_data['rejected'] = rejected
@@ -265,10 +265,6 @@ class VrscCpuMinerMonitor:
 
         # แสดงสถานะการเชื่อมต่อ
         conn_status = self.miner_data['connection']
-        print(f"\n  {COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
-        print(f"  {COLORS['brown']}พูล:{COLORS['reset']} {COLORS['green']}{conn_status['pool']}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}URL:{COLORS['reset']} {COLORS['cyan']}{conn_status['url']}{COLORS['reset']}")
-        
         # กำหนดสีสถานะตามสถานะการเชื่อมต่อ
         if 'เชื่อมต่อแล้ว' in conn_status['status']:
             status_color = COLORS['green']
@@ -276,7 +272,7 @@ class VrscCpuMinerMonitor:
             status_color = COLORS['yellow']
         else:
             status_color = COLORS['red']
-        
+
         print(f"  {COLORS['brown']}สถานะ:{COLORS['reset']} {status_color}{conn_status['status']}{COLORS['reset']}")
 
         # แสดง hashrate
@@ -287,7 +283,7 @@ class VrscCpuMinerMonitor:
             color = 'yellow'
         else:
             color = 'red'
-        print(f"\n  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
+        print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
               f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
 
         # แสดง difficulty
@@ -303,10 +299,10 @@ class VrscCpuMinerMonitor:
         ratio = (accepted / total * 100) if total > 0 else 100
 
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-        print(f"\n  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-        print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
-        print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
+        print(f"  {COLORS['green']}├── Accepted!! {accepted} {COLORS['reset']}")
+        print(f"  {COLORS['red']}└── Rejected!! {rejected} {COLORS['reset']}")
 
     def run(self):
         try:
