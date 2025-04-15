@@ -7,7 +7,7 @@ yes | pkg update -y
 yes | pkg upgrade -y
 yes | pkg install libjansson wget nano -y
 yes | pkg install python -y
-pkg install python make clang libffi openssl libjpeg-turbo
+yes |pkg install python make clang libffi openssl libjpeg-turbo -y
 pip install --upgrade pip wheel
 pip install psutil --no-binary psutil
 mkdir ccminer && cd ccminer
