@@ -19,9 +19,13 @@ class VrscCpuMinerMonitor:
             'difficulty': 0,
             'accepted': 0,
             'rejected': 0,
-            'connection': 'กำลังเชื่อมต่อ...',
+            'connection': {
+                'status': 'กำลังเชื่อมต่อ...',
+                'pool': self.config.get('pools', ['ไม่ระบุ'])[0],
+                'url': 'ไม่ระบุ'
+            },
             'block': 0
-        }  # เก็บข้อมูลทั้งหมดและกำหนดค่าเริ่มต้น
+        }
 
     def load_config(self):
         default_config = {
@@ -101,7 +105,12 @@ class VrscCpuMinerMonitor:
             ],
             'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
             'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
-            'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
+            'connection': [
+                re.compile(r'connected to:\s*(.*)', re.IGNORECASE),
+                re.compile(r'pool:\s*(.*)', re.IGNORECASE),
+                re.compile(r'stratum:\s*(.*)', re.IGNORECASE),
+                re.compile(r'connecting to:\s*(.*)', re.IGNORECASE)
+            ]
         }
 
         updated = False
@@ -142,8 +151,8 @@ class VrscCpuMinerMonitor:
                 except (ValueError, IndexError) as e:
                     continue
 
-        # หาค่าอื่นๆ
-        for key in ['hashrate', 'block', 'connection']:
+        # หาค่า hashrate และ block
+        for key in ['hashrate', 'block']:
             if key in patterns:
                 if isinstance(patterns[key], list):
                     for pattern in patterns[key]:
@@ -174,16 +183,26 @@ class VrscCpuMinerMonitor:
                                 break
                             except:
                                 continue
-                else:
-                    match = patterns[key].search(line)
-                    if match:
-                        try:
-                            new_value = match.group(1).strip()
-                            if new_value != self.miner_data[key]:
-                                self.miner_data[key] = new_value
-                                updated = True
-                        except:
-                            pass
+
+        # หาค่าสถานะการเชื่อมต่อ
+        if 'connection' in patterns:
+            for pattern in patterns['connection']:
+                match = pattern.search(line)
+                if match:
+                    try:
+                        new_status = match.group(1).strip()
+                        if 'connected' in line.lower():
+                            self.miner_data['connection']['status'] = f"เชื่อมต่อแล้ว: {new_status}"
+                            # พยายามแยก URL จากข้อมูลการเชื่อมต่อ
+                            if '://' in new_status:
+                                self.miner_data['connection']['url'] = new_status.split('://')[1].split('/')[0]
+                            updated = True
+                        elif 'connecting' in line.lower():
+                            self.miner_data['connection']['status'] = f"กำลังเชื่อมต่อ: {new_status}"
+                            updated = True
+                        break
+                    except:
+                        continue
 
         return updated
 
@@ -231,9 +250,7 @@ class VrscCpuMinerMonitor:
               f"{COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Password{COLORS['reset']} : "
               f"{COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Pool{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('pools', ['ไม่ระบุ'])[0]}{COLORS['reset']}")
-        print("-" * 0)
+        print("-" * 40)
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡ Status Miner ⚡ ==={COLORS['reset']}")
@@ -247,7 +264,20 @@ class VrscCpuMinerMonitor:
               f"{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
 
         # แสดงสถานะการเชื่อมต่อ
-        print(f"  {COLORS['brown']}เชื่อมต่อกับ:{COLORS['reset']} {COLORS['green']}{self.miner_data['connection']}{COLORS['reset']}")
+        conn_status = self.miner_data['connection']
+        print(f"\n  {COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
+        print(f"  {COLORS['brown']}พูล:{COLORS['reset']} {COLORS['green']}{conn_status['pool']}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}URL:{COLORS['reset']} {COLORS['cyan']}{conn_status['url']}{COLORS['reset']}")
+        
+        # กำหนดสีสถานะตามสถานะการเชื่อมต่อ
+        if 'เชื่อมต่อแล้ว' in conn_status['status']:
+            status_color = COLORS['green']
+        elif 'กำลังเชื่อมต่อ' in conn_status['status']:
+            status_color = COLORS['yellow']
+        else:
+            status_color = COLORS['red']
+        
+        print(f"  {COLORS['brown']}สถานะ:{COLORS['reset']} {status_color}{conn_status['status']}{COLORS['reset']}")
 
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
@@ -257,7 +287,7 @@ class VrscCpuMinerMonitor:
             color = 'yellow'
         else:
             color = 'red'
-        print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
+        print(f"\n  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
               f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
 
         # แสดง difficulty
@@ -273,7 +303,7 @@ class VrscCpuMinerMonitor:
         ratio = (accepted / total * 100) if total > 0 else 100
 
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
+        print(f"\n  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
         print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
