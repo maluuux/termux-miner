@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import json
 import os
+import requests
 
 
 class VrscCpuMinerMonitor:
@@ -14,6 +15,9 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None
         self.last_update_time = None
+        self.last_lines = []  # เก็บ 2 บรรทัดล่าสุด
+        self.max_last_lines = 2
+        self.internet_status = "กำลังตรวจสอบ..."
         self.miner_data = {
             'hashrate': 0,
             'difficulty': 0,
@@ -26,6 +30,15 @@ class VrscCpuMinerMonitor:
             },
             'block': 0
         }
+        self.check_internet_connection()
+
+    def check_internet_connection(self):
+        """ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"""
+        try:
+            requests.get('https://www.google.com', timeout=5)
+            self.internet_status = "✅ ออนไลน์"
+        except:
+            self.internet_status = "❌ ออฟไลน์"
 
     def load_config(self):
         default_config = {
@@ -57,7 +70,7 @@ class VrscCpuMinerMonitor:
                         loaded_config = json.load(f)
 
                         wallet = loaded_config.get('wallet_address',
-                                                   loaded_config.get('user', 'ไม่ระบุ'))
+                                               loaded_config.get('user', 'ไม่ระบุ'))
                         if '.' in wallet:
                             base_wallet, miner_name = wallet.rsplit('.', 1)
                             loaded_config['base_wallet'] = base_wallet
@@ -84,6 +97,12 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
+        # เพิ่มบรรทัดล่าสุดลงในรายการ
+        if line.strip():
+            self.last_lines.append(line.strip())
+            if len(self.last_lines) > self.max_last_lines:
+                self.last_lines.pop(0)
+
         patterns = {
             'hashrate': [
                 re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
@@ -190,15 +209,11 @@ class VrscCpuMinerMonitor:
                 match = pattern.search(line)
                 if match:
                     try:
-                        new_status = match.group(1).strip()
                         if 'connected' in line.lower():
-                            self.miner_data['connection']['status'] = f"เชื่อมต่อแล้ว: {new_status}"
-                            # พยายามแยก URL จากข้อมูลการเชื่อมต่อ
-                            if '://' in new_status:
-                                self.miner_data['connection']['url'] = new_status.split('://')[1].split('/')[0]
+                            self.miner_data['connection']['status'] = "✅ เชื่อมต่อแล้ว"
                             updated = True
                         elif 'connecting' in line.lower():
-                            self.miner_data['connection']['status'] = f"กำลังเชื่อมต่อ: {new_status}"
+                            self.miner_data['connection']['status'] = "🔄 กำลังเชื่อมต่อ"
                             updated = True
                         break
                     except:
@@ -235,45 +250,39 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}VRSC Miner Edit by ...... {COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner Monitor ⚡{COLORS['reset']}")
         print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print("-" * 40)
 
-        # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}{COLORS['purple']}Show settings.......{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Password{COLORS['reset']} : "
-              f"{COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+        # ส่วนแสดง Config
+        print(f"{COLORS['bold']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
+        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+        print("-" * 40)
+
+        # ส่วนสถานะการเชื่อมต่อ
+        print(f"{COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
+        print(f"  {COLORS['brown']}อินเทอร์เน็ต:{COLORS['reset']} {self.internet_status}")
+        print(f"  {COLORS['brown']}สถานะพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
         print("-" * 40)
 
         # ส่วนสถานะการขุด
-        print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡ Status Miner ⚡ ==={COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
+
+        # แสดง 2 บรรทัดล่าสุดจากล็อก
+        print(f"{COLORS['cyan']}⏳ ล็อกล่าสุด:{COLORS['reset']}")
+        for line in self.last_lines[-2:]:
+            print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
 
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:"
-              f"{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
-
-        # แสดงสถานะการเชื่อมต่อ
-        conn_status = self.miner_data['connection']
-        # กำหนดสีสถานะตามสถานะการเชื่อมต่อ
-        if 'เชื่อมต่อแล้ว' in conn_status['status']:
-            status_color = COLORS['green']
-        elif 'กำลังเชื่อมต่อ' in conn_status['status']:
-            status_color = COLORS['yellow']
-        else:
-            status_color = COLORS['red']
-
-        print(f"  {COLORS['brown']}สถานะ:{COLORS['reset']} {status_color}{conn_status['status']}{COLORS['reset']}")
+        print(f"\n{COLORS['cyan']}⏱️ เวลาทำงาน: {hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
 
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
@@ -284,13 +293,7 @@ class VrscCpuMinerMonitor:
         else:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
-
-        # แสดง difficulty
-        current_diff = self.miner_data['difficulty']
-        diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
-        print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: "
-              f"{COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
 
         # แสดง shares
         accepted = self.miner_data['accepted']
@@ -299,10 +302,10 @@ class VrscCpuMinerMonitor:
         ratio = (accepted / total * 100) if total > 0 else 100
 
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']}: "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-        print(f"  {COLORS['green']}├── Accepted!! {accepted} {COLORS['reset']}")
-        print(f"  {COLORS['red']}└── Rejected!! {rejected} {COLORS['reset']}")
+        print(f"    ├─ {COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
+        print(f"    └─ {COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
 
     def run(self):
         try:
@@ -315,13 +318,11 @@ class VrscCpuMinerMonitor:
             )
 
             print("กำลังเริ่มต้นเครื่องขุด...กด Ctrl+C เพื่อหยุด")
-
-            # แสดง dashboard เริ่มต้น
             self.display_dashboard()
 
             for line in iter(process.stdout.readline, ''):
-                if self.parse_miner_output(line):  # ถ้ามีการอัปเดตข้อมูล
-                    self.display_dashboard()  # แสดงผลข้อมูลใหม่
+                if self.parse_miner_output(line):
+                    self.display_dashboard()
 
         except KeyboardInterrupt:
             print("\nกำลังหยุดการตรวจสอบ...")
