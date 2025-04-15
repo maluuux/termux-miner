@@ -71,30 +71,29 @@ class VrscCpuMinerMonitor:
     return default_config
 
     def parse_miner_output(self, line):
-        """Parse output จาก miner"""
-        patterns = {
-            'hashrate': [
-                re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
-                re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
-                re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
-            ],
-            'accepted_rejected': [
-                re.compile(r'accepted\s*:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE),
-                re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),
-                re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)
-            ],
-            'difficulty': [
-                re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
-            ],
-            'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
-            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
-            'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
-        }
+         patterns = {
+                'hashrate': [
+                    re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
+                    re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
+                    re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
+                ],
+                'accepted_rejected': [
+                    re.compile(r'accepted\s*:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE),
+                    re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),
+                    re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)
+                ],
+                'difficulty': [
+                    re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                    re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                    re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                    re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                    re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                    re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
+                ],
+                'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
+                'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
+                'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
+            }
 
         results = {}
 
