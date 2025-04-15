@@ -14,7 +14,14 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None
         self.last_update_time = None
-        self.miner_data = {}  # เพิ่มตัวแปรนี้เพื่อเก็บข้อมูล
+        self.miner_data = {
+            'hashrate': 0,
+            'difficulty': 0,
+            'accepted': 0,
+            'rejected': 0,
+            'connection': 'กำลังเชื่อมต่อ...',
+            'block': 0
+        }  # เก็บข้อมูลทั้งหมดและกำหนดค่าเริ่มต้น
 
     def load_config(self):
         default_config = {
@@ -30,7 +37,7 @@ class VrscCpuMinerMonitor:
             'retry-pause': 'ไม่ระบุ',
             'api-allow': 'ไม่ระบุ',
             'api-bind': 'ไม่ระบุ',
-            'base_wallet': 'ไม่ระบุ'  # เพิ่มฟิลด์ใหม่สำหรับเก็บ wallet ที่ตัดชื่อ miner แล้ว
+            'base_wallet': 'ไม่ระบุ'
         }
 
         try:
@@ -45,8 +52,7 @@ class VrscCpuMinerMonitor:
                     with open(path, 'r') as f:
                         loaded_config = json.load(f)
 
-                        # ดึงและแยก wallet กับชื่อ miner
-                        wallet = loaded_config.get('wallet_address', 
+                        wallet = loaded_config.get('wallet_address',
                                                 loaded_config.get('user', 'ไม่ระบุ'))
                         if '.' in wallet:
                             base_wallet, miner_name = wallet.rsplit('.', 1)
@@ -55,9 +61,8 @@ class VrscCpuMinerMonitor:
                         else:
                             loaded_config['base_wallet'] = wallet
 
-                        # ปรับปรุงการโหลด pools (ใช้แค่ pool แรก)
-                        if ('pools' in loaded_config and 
-                            isinstance(loaded_config['pools'], list) and 
+                        if ('pools' in loaded_config and
+                            isinstance(loaded_config['pools'], list) and
                             len(loaded_config['pools']) > 0):
                             first_pool = loaded_config['pools'][0]
                             if isinstance(first_pool, dict):
@@ -99,15 +104,18 @@ class VrscCpuMinerMonitor:
             'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
         }
 
-        results = {}
+        updated = False
 
         # หาค่า difficulty
         for pattern in patterns['difficulty']:
             match = pattern.search(line)
             if match:
                 try:
-                    results['difficulty'] = float(match.group(1))
-                    self.last_difficulty = results['difficulty']
+                    new_diff = float(match.group(1))
+                    if new_diff != self.miner_data['difficulty']:
+                        self.miner_data['difficulty'] = new_diff
+                        updated = True
+                    self.last_difficulty = new_diff
                     self.last_update_time = time.time()
                     break
                 except (ValueError, IndexError):
@@ -121,14 +129,18 @@ class VrscCpuMinerMonitor:
                     if pattern.pattern == r'accepted\s*:\s*(\d+)\s*/\s*(\d+)':
                         accepted = int(match.group(1))
                         total = int(match.group(2))
-                        results['accepted'] = accepted
-                        results['rejected'] = total - accepted
+                        rejected = total - accepted
                     else:
-                        results['accepted'] = int(match.group(1))
-                        results['rejected'] = int(match.group(2))
+                        accepted = int(match.group(1))
+                        rejected = int(match.group(2))
+                    
+                    if accepted != self.miner_data['accepted'] or rejected != self.miner_data['rejected']:
+                        self.miner_data['accepted'] = accepted
+                        self.miner_data['rejected'] = rejected
+                        updated = True
                     break
                 except (ValueError, IndexError) as e:
-                    print(f"DEBUG: Error parsing accepted/rejected - {e}")
+                    continue
 
         # หาค่าอื่นๆ
         for key in ['hashrate', 'block', 'connection']:
@@ -142,18 +154,23 @@ class VrscCpuMinerMonitor:
                                     value = float(match.group(1))
                                     unit = match.group(2).upper()
                                     conversions = {
-                                        'H': 1, 
-                                        'KH': 1000, 
-                                        'MH': 1000000, 
+                                        'H': 1,
+                                        'KH': 1000,
+                                        'MH': 1000000,
                                         'GH': 1000000000
                                     }
                                     value *= conversions.get(unit, 1)
-                                    results[key] = value
+                                    if value != self.miner_data['hashrate']:
+                                        self.miner_data['hashrate'] = value
+                                        updated = True
                                     self.hashrate_history.append(value)
                                     if len(self.hashrate_history) > self.max_history:
                                         self.hashrate_history.pop(0)
                                 else:
-                                    results[key] = int(match.group(1))
+                                    new_value = int(match.group(1))
+                                    if new_value != self.miner_data[key]:
+                                        self.miner_data[key] = new_value
+                                        updated = True
                                 break
                             except:
                                 continue
@@ -161,12 +178,14 @@ class VrscCpuMinerMonitor:
                     match = patterns[key].search(line)
                     if match:
                         try:
-                            results[key] = match.group(1).strip()
+                            new_value = match.group(1).strip()
+                            if new_value != self.miner_data[key]:
+                                self.miner_data[key] = new_value
+                                updated = True
                         except:
                             pass
 
-        self.miner_data = results  # อัปเดตข้อมูลล่าสุด
-        return results
+        return updated
 
     def format_hashrate(self, hashrate):
         """จัดรูปแบบ hashrate"""
@@ -227,42 +246,37 @@ class VrscCpuMinerMonitor:
         print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:"
               f"{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
 
-        # ใช้ self.miner_data แทน miner_data
-        if 'connection' in self.miner_data:
-            print(f"  เชื่อมต่อกับ: {COLORS['green']}{self.miner_data['connection']}{COLORS['reset']}")
+        # แสดงสถานะการเชื่อมต่อ
+        print(f"  {COLORS['brown']}เชื่อมต่อกับ:{COLORS['reset']} {COLORS['green']}{self.miner_data['connection']}{COLORS['reset']}")
 
-        if 'hashrate' in self.miner_data:
-            hashrate = self.miner_data['hashrate']
-            if hashrate > 10000:
-                color = 'green'
-            elif hashrate > 1000:
-                color = 'yellow'
-            else:
-                color = 'red'
-            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-                  f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
+        # แสดง hashrate
+        hashrate = self.miner_data['hashrate']
+        if hashrate > 10000:
+            color = 'green'
+        elif hashrate > 1000:
+            color = 'yellow'
+        else:
+            color = 'red'
+        print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
+              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
 
         # แสดง difficulty
-        current_diff = self.miner_data.get('difficulty')
-        if current_diff is not None:
-            diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
-            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: "
-                  f"{COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
-        else:
-            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}    กำลังค้นหา... {COLORS['reset']}")
+        current_diff = self.miner_data['difficulty']
+        diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
+        print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: "
+              f"{COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
 
         # แสดง shares
-        if 'accepted' in self.miner_data or 'rejected' in self.miner_data:
-            accepted = self.miner_data.get('accepted', 0)
-            rejected = self.miner_data.get('rejected', 0)
-            total = accepted + rejected
-            ratio = (accepted / total * 100) if total > 0 else 100
+        accepted = self.miner_data['accepted']
+        rejected = self.miner_data['rejected']
+        total = accepted + rejected
+        ratio = (accepted / total * 100) if total > 0 else 100
 
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
-                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-            print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
-            print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
+        ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
+              f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+        print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
+        print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
 
     def run(self):
         try:
@@ -276,9 +290,12 @@ class VrscCpuMinerMonitor:
 
             print("กำลังเริ่มต้นเครื่องขุด...กด Ctrl+C เพื่อหยุด")
 
+            # แสดง dashboard เริ่มต้น
+            self.display_dashboard()
+
             for line in iter(process.stdout.readline, ''):
-                self.parse_miner_output(line)  # อัปเดต self.miner_data
-                self.display_dashboard()  # แสดงผลข้อมูล
+                if self.parse_miner_output(line):  # ถ้ามีการอัปเดตข้อมูล
+                    self.display_dashboard()  # แสดงผลข้อมูลใหม่
 
         except KeyboardInterrupt:
             print("\nกำลังหยุดการตรวจสอบ...")
