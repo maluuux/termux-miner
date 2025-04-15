@@ -17,39 +17,59 @@ class VrscCpuMinerMonitor:
         self.miner_data = {}  # เพิ่มตัวแปรนี้เพื่อเก็บข้อมูล
 
     def load_config(self):
-        """โหลดการตั้งค่าจากไฟล์ config"""
-        default_config = {
-            'wallet_address': 'ไม่ระบุ',
-            'miner_name': 'ไม่ระบุ',
-            'user': 'ไม่ระบุ',
-            'pass': 'ไม่ระบุ',
-            'algo': 'ไม่ระบุ',
-            'threads': 'ไม่ระบุ',
-            'pools': [],
-            'cpu-priority': 'ไม่ระบุ',
-            'cpu-affinity': 'ไม่ระบุ',
-            'retry-pause': 'ไม่ระบุ',
-            'api-allow': 'ไม่ระบุ',
-            'api-bind': 'ไม่ระบุ'
-        }
+    """โหลดการตั้งค่าจากไฟล์ config"""
+    default_config = {
+        'wallet_address': 'ไม่ระบุ',
+        'miner_name': 'ไม่ระบุ',
+        'user': 'ไม่ระบุ',
+        'pass': 'ไม่ระบุ',
+        'algo': 'ไม่ระบุ',
+        'threads': 'ไม่ระบุ',
+        'pools': ['ไม่ระบุ'],
+        'cpu-priority': 'ไม่ระบุ',
+        'cpu-affinity': 'ไม่ระบุ',
+        'retry-pause': 'ไม่ระบุ',
+        'api-allow': 'ไม่ระบุ',
+        'api-bind': 'ไม่ระบุ',
+        'base_wallet': 'ไม่ระบุ'  # เพิ่มฟิลด์ใหม่สำหรับเก็บ wallet ที่ตัดชื่อ miner แล้ว
+    }
 
-        try:
-            config_paths = [
-                'config.json',
-                '/data/data/com.termux/files/home/config.json',
-                '/data/data/com.termux/files/usr/etc/verus/config.json'
-            ]
+    try:
+        config_paths = [
+            'config.json',
+            '/data/data/com.termux/files/home/config.json',
+            '/data/data/com.termux/files/usr/etc/verus/config.json'
+        ]
 
-            for path in config_paths:
-                if os.path.exists(path):
-                    with open(path, 'r') as f:
-                        loaded_config = json.load(f)
-                        default_config.update(loaded_config)
-                    break
-        except Exception as e:
-            print(f"ไม่สามารถโหลด config ได้: {e}")
+        for path in config_paths:
+            if os.path.exists(path):
+                with open(path, 'r') as f:
+                    loaded_config = json.load(f)
+                    
+                    # ดึงและแยก wallet กับชื่อ miner
+                    wallet = loaded_config.get('wallet_address', loaded_config.get('user', 'ไม่ระบุ'))
+                    if '.' in wallet:
+                        base_wallet, miner_name = wallet.rsplit('.', 1)
+                        loaded_config['base_wallet'] = base_wallet
+                        loaded_config['miner_name'] = miner_name
+                    else:
+                        loaded_config['base_wallet'] = wallet
+                    
+                    # ปรับปรุงการโหลด pools (ใช้แค่ pool แรก)
+                    if 'pools' in loaded_config and isinstance(loaded_config['pools'], list) and len(loaded_config['pools']) > 0:
+                        first_pool = loaded_config['pools'][0]
+                        if isinstance(first_pool, dict):
+                            pool_str = f"{first_pool.get('name', 'ไม่มีชื่อ')} ({first_pool.get('url', 'ไม่มีURL')})"
+                            loaded_config['pools'] = [pool_str]
+                        else:
+                            loaded_config['pools'] = [str(first_pool)]
+                    
+                    default_config.update(loaded_config)
+                break
+    except Exception as e:
+        print(f"ไม่สามารถโหลด config ได้: {e}")
 
-        return default_config
+    return default_config
 
     def parse_miner_output(self, line):
         """Parse output จาก miner"""
@@ -175,17 +195,12 @@ class VrscCpuMinerMonitor:
 
         # ส่วนข้อมูลผู้ใช้และ Miner
         print(f"{COLORS['bold']}{COLORS['purple']}Show settings.......{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Pass{COLORS['reset']} : {COLORS['orange_text']}{self.config['pass']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
-
+        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Pool{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pools', ['ไม่ระบุ'])[0]}{COLORS['reset']}")
         print("-" * 0)
 
         # ส่วนสถานะการขุด
@@ -196,9 +211,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(
-            f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
-        print(f"{COLORS['bold']}{COLORS['reset']}")
+        print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
 
         # ใช้ self.miner_data แทน miner_data
         if 'connection' in self.miner_data:
