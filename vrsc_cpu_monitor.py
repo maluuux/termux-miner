@@ -150,93 +150,89 @@ class VrscCpuMinerMonitor:
         return f"{hashrate:.2f} H/s"
 
     def display_dashboard(self):
-        """แสดงผลข้อมูลการขุด"""
-        COLORS = {
-            'green': '\033[92m', 'yellow': '\033[93m',
-            'red': '\033[91m', 'blue': '\033[94m',
-            'cyan': '\033[96m', 'purple': '\033[95m',
-            'reset': '\033[0m', 'bold': '\033[1m',
-            'brown': '\033[33m',
-            'Light_Gray': '\033[37m',
-            'yellow_bg': '\033[43m',
-            'green_bg': '\033[42m',
-            'orange_bg': '\033[48;5;208m',
-            'black_text': '\033[30m',
-            'white_bg': '\033[48;5;15m',
-            'orange_text': '\033[38;5;208m'
-        }
+    """แสดงผลข้อมูลการขุด"""
+    COLORS = {
+        'green': '\033[92m', 'yellow': '\033[93m',
+        'red': '\033[91m', 'blue': '\033[94m',
+        'cyan': '\033[96m', 'purple': '\033[95m',
+        'reset': '\033[0m', 'bold': '\033[1m',
+        'brown': '\033[33m',
+        'Light_Gray': '\033[37m',
+        'yellow_bg': '\033[43m',
+        'green_bg': '\033[42m',
+        'orange_bg': '\033[48;5;208m',
+        'black_text': '\033[30m',
+        'white_bg': '\033[48;5;15m',
+        'orange_text': '\033[38;5;208m'
+    }
 
-        # ล้างหน้าจอ
-        print("\033[2J\033[H", end="")
+    # ล้างหน้าจอ
+    print("\033[2J\033[H", end="")
 
-        # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}VRSC Miner Edit by ...... {COLORS['reset']}")
-        print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+    # ส่วนหัว
+    print(f"{COLORS['bold']}{COLORS['purple']}VRSC Miner Edit by ...... {COLORS['reset']}")
+    print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
 
-        # ส่วนข้อมูลผู้ใช้และ Miner
-        print(f"{COLORS['bold']}{COLORS['purple']}Show settings.......{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config['wallet_address']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config['miner_name']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config['threads']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Pass{COLORS['reset']} : {COLORS['orange_text']}{self.config['pass']}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config['pools'], 1)])}{COLORS['reset']}")
+    # ส่วนข้อมูลผู้ใช้และ Miner
+    print(f"{COLORS['bold']}{COLORS['purple']}Show settings.......{COLORS['reset']}")
+    print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('wallet_address', 'ไม่ระบุ')}{COLORS['reset']}")
+    print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+    print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+    print(f"  {COLORS['brown']}Pass{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+    print(f"  {COLORS['brown']}Pools{COLORS['reset']} : {COLORS['orange_text']}{', '.join([f'{i}.{pool}' for i, pool in enumerate(self.config.get('pools', ['ไม่ระบุ']), 1)])}{COLORS['reset']}")
 
-        print("-" * 0)
+    print("-" * 0)
 
-        # ส่วนสถานะการขุด
-        print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡ Status Miner ⚡ ==={COLORS['reset']}")
+    # ส่วนสถานะการขุด
+    print(f"{COLORS['bold']}{COLORS['purple']}=== ⚡ Status Miner ⚡ ==={COLORS['reset']}")
 
-        # ส่วนรันไทม์
-        runtime = int(time.time() - self.start_time)
-        hours = runtime // 3600
-        minutes = (runtime % 3600) // 60
-        seconds = runtime % 60
-        print(
-            f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
-        print(f"{COLORS['bold']}{COLORS['reset']}")
+    # ส่วนรันไทม์
+    runtime = int(time.time() - self.start_time)
+    hours = runtime // 3600
+    minutes = (runtime % 3600) // 60
+    seconds = runtime % 60
+    print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes:02d}:{COLORS['reset']}{seconds:02d}{COLORS['cyan']} ]{COLORS['reset']}")
+    print(f"{COLORS['bold']}{COLORS['reset']}")
 
-        # ใช้ self.miner_data แทน miner_data
-        if 'connection' in self.miner_data:
-            print(f"  เชื่อมต่อกับ: {COLORS['green']}{self.miner_data['connection']}{COLORS['reset']}")
+    # แสดงข้อมูลการเชื่อมต่อ
+    connection = self.miner_data.get('connection', 'กำลังเชื่อมต่อ...')
+    print(f"  เชื่อมต่อกับ: {COLORS['green']}{connection}{COLORS['reset']}")
 
-        if 'hashrate' in self.miner_data:
-            hashrate = self.miner_data['hashrate']
-            if hashrate > 10000:
-                color = 'green'
-            elif hashrate > 1000:
-                color = 'yellow'
-            else:
-                color = 'red'
-            print(
-                f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
-
-        # แสดง difficulty
-        current_diff = self.miner_data.get('difficulty')
-        if current_diff is not None:
-            diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
-            print(
-                f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+    # แสดง hashrate
+    hashrate = self.miner_data.get('hashrate')
+    if hashrate is not None:
+        if hashrate > 10000:
+            color = 'green'
+        elif hashrate > 1000:
+            color = 'yellow'
         else:
-            print(
-                f"  {COLORS['yellow_bg']}{COLORS['black_text']}    กำลังค้นหา... {COLORS['reset']}")
+            color = 'red'
+        print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
+    else:
+        print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS['yellow']}กำลังคำนวณ...{COLORS['reset']}")
 
-        # แสดง shares
-        if 'accepted' in self.miner_data or 'rejected' in self.miner_data:
-            accepted = self.miner_data.get('accepted', 0)
-            rejected = self.miner_data.get('rejected', 0)
-            total = accepted + rejected
-            ratio = (accepted / total * 100) if total > 0 else 100
+    # แสดง difficulty - ใช้ค่าล่าสุดที่ได้หรือแสดงค่าเดิมถ้าไม่มีข้อมูลใหม่
+    current_diff = self.miner_data.get('difficulty', self.last_difficulty)
+    if current_diff is not None:
+        diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
+        print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+        self.last_difficulty = current_diff  # บันทึกค่าไว้ใช้ครั้งต่อไป
+    else:
+        print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS['yellow']}กำลังค้นหา...{COLORS['reset']}")
 
-            ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(
-                f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-            print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
-            print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
+    # แสดง shares - ใช้ค่าล่าสุดหรือแสดงค่าเดิมถ้าไม่มีข้อมูลใหม่
+    accepted = self.miner_data.get('accepted', 0)
+    rejected = self.miner_data.get('rejected', 0)
+    total = accepted + rejected
+    
+    if total > 0:
+        ratio = (accepted / total * 100)
+        ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+        print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
+        print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
+    else:
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS['yellow']}รอข้อมูล...{COLORS['reset']}")
 
     def run(self):
         try:
