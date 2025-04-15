@@ -17,22 +17,21 @@ class VrscCpuMinerMonitor:
         self.miner_data = {}  # เพิ่มตัวแปรนี้เพื่อเก็บข้อมูล
 
     def load_config(self):
-    """โหลดการตั้งค่าจากไฟล์ config"""
-    default_config = {
-        'wallet_address': 'ไม่ระบุ',
-        'miner_name': 'ไม่ระบุ',
-        'user': 'ไม่ระบุ',
-        'pass': 'ไม่ระบุ',
-        'algo': 'ไม่ระบุ',
-        'threads': 'ไม่ระบุ',
-        'pools': ['ไม่ระบุ'],
-        'cpu-priority': 'ไม่ระบุ',
-        'cpu-affinity': 'ไม่ระบุ',
-        'retry-pause': 'ไม่ระบุ',
-        'api-allow': 'ไม่ระบุ',
-        'api-bind': 'ไม่ระบุ',
-        'base_wallet': 'ไม่ระบุ'  # เพิ่มฟิลด์ใหม่สำหรับเก็บ wallet ที่ตัดชื่อ miner แล้ว
-    }
+        default_config = {
+            'wallet_address': 'ไม่ระบุ',
+            'miner_name': 'ไม่ระบุ',
+            'user': 'ไม่ระบุ',
+            'pass': 'ไม่ระบุ',
+            'algo': 'ไม่ระบุ',
+            'threads': 'ไม่ระบุ',
+            'pools': ['ไม่ระบุ'],
+            'cpu-priority': 'ไม่ระบุ',
+            'cpu-affinity': 'ไม่ระบุ',
+            'retry-pause': 'ไม่ระบุ',
+            'api-allow': 'ไม่ระบุ',
+            'api-bind': 'ไม่ระบุ',
+            'base_wallet': 'ไม่ระบุ'  # เพิ่มฟิลด์ใหม่สำหรับเก็บ wallet ที่ตัดชื่อ miner แล้ว
+        }
 
     try:
         config_paths = [
