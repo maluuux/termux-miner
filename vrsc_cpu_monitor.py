@@ -33,67 +33,71 @@ class VrscCpuMinerMonitor:
             'base_wallet': 'ไม่ระบุ'  # เพิ่มฟิลด์ใหม่สำหรับเก็บ wallet ที่ตัดชื่อ miner แล้ว
         }
 
-    try:
-        config_paths = [
-            'config.json',
-            '/data/data/com.termux/files/home/config.json',
-            '/data/data/com.termux/files/usr/etc/verus/config.json'
-        ]
+        try:
+            config_paths = [
+                'config.json',
+                '/data/data/com.termux/files/home/config.json',
+                '/data/data/com.termux/files/usr/etc/verus/config.json'
+            ]
 
-        for path in config_paths:
-            if os.path.exists(path):
-                with open(path, 'r') as f:
-                    loaded_config = json.load(f)
-                    
-                    # ดึงและแยก wallet กับชื่อ miner
-                    wallet = loaded_config.get('wallet_address', loaded_config.get('user', 'ไม่ระบุ'))
-                    if '.' in wallet:
-                        base_wallet, miner_name = wallet.rsplit('.', 1)
-                        loaded_config['base_wallet'] = base_wallet
-                        loaded_config['miner_name'] = miner_name
-                    else:
-                        loaded_config['base_wallet'] = wallet
-                    
-                    # ปรับปรุงการโหลด pools (ใช้แค่ pool แรก)
-                    if 'pools' in loaded_config and isinstance(loaded_config['pools'], list) and len(loaded_config['pools']) > 0:
-                        first_pool = loaded_config['pools'][0]
-                        if isinstance(first_pool, dict):
-                            pool_str = f"{first_pool.get('name', 'ไม่มีชื่อ')} ({first_pool.get('url', 'ไม่มีURL')})"
-                            loaded_config['pools'] = [pool_str]
+            for path in config_paths:
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        loaded_config = json.load(f)
+
+                        # ดึงและแยก wallet กับชื่อ miner
+                        wallet = loaded_config.get('wallet_address', 
+                                                loaded_config.get('user', 'ไม่ระบุ'))
+                        if '.' in wallet:
+                            base_wallet, miner_name = wallet.rsplit('.', 1)
+                            loaded_config['base_wallet'] = base_wallet
+                            loaded_config['miner_name'] = miner_name
                         else:
-                            loaded_config['pools'] = [str(first_pool)]
-                    
-                    default_config.update(loaded_config)
-                break
-    except Exception as e:
-        print(f"ไม่สามารถโหลด config ได้: {e}")
+                            loaded_config['base_wallet'] = wallet
 
-    return default_config
+                        # ปรับปรุงการโหลด pools (ใช้แค่ pool แรก)
+                        if ('pools' in loaded_config and 
+                            isinstance(loaded_config['pools'], list) and 
+                            len(loaded_config['pools']) > 0):
+                            first_pool = loaded_config['pools'][0]
+                            if isinstance(first_pool, dict):
+                                pool_str = (f"{first_pool.get('name', 'ไม่มีชื่อ')} "
+                                          f"({first_pool.get('url', 'ไม่มีURL')})")
+                                loaded_config['pools'] = [pool_str]
+                            else:
+                                loaded_config['pools'] = [str(first_pool)]
+
+                        default_config.update(loaded_config)
+                    break
+        except Exception as e:
+            print(f"ไม่สามารถโหลด config ได้: {e}")
+
+        return default_config
 
     def parse_miner_output(self, line):
-         patterns = {
-                'hashrate': [
-                    re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
-                    re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
-                    re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
-                ],
-                'accepted_rejected': [
-                    re.compile(r'accepted\s*:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE),
-                    re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),
-                    re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)
-                ],
-                'difficulty': [
-                    re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                    re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                    re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                    re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                    re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
-                    re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
-                ],
-                'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
-                'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
-                'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
-            }
+        patterns = {
+            'hashrate': [
+                re.compile(r'(\d+\.?\d*)\s*(H|kH|MH|GH)/s'),
+                re.compile(r'hashrate:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE),
+                re.compile(r'speed:\s*(\d+\.?\d*)\s*(H|kH|MH|GH)/s', re.IGNORECASE)
+            ],
+            'accepted_rejected': [
+                re.compile(r'accepted\s*:\s*(\d+)\s*/\s*(\d+)', re.IGNORECASE),
+                re.compile(r'accepted\s*=\s*(\d+)\s*rejected\s*=\s*(\d+)', re.IGNORECASE),
+                re.compile(r'yes!:\s*(\d+)\s*no!:\s*(\d+)', re.IGNORECASE)
+            ],
+            'difficulty': [
+                re.compile(r'difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'net diff[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'network difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'current difficulty[:\s]*(\d+\.?\d*)', re.IGNORECASE),
+                re.compile(r'\[\d+\] diff[:\s]*(\d+\.?\d*)', re.IGNORECASE)
+            ],
+            'share': re.compile(r'share:\s*(\d+)/(\d+)', re.IGNORECASE),
+            'block': re.compile(r'block:\s*(\d+)', re.IGNORECASE),
+            'connection': re.compile(r'connected to:\s*(.*)', re.IGNORECASE)
+        }
 
         results = {}
 
@@ -137,7 +141,12 @@ class VrscCpuMinerMonitor:
                                 if key == 'hashrate':
                                     value = float(match.group(1))
                                     unit = match.group(2).upper()
-                                    conversions = {'H': 1, 'KH': 1000, 'MH': 1000000, 'GH': 1000000000}
+                                    conversions = {
+                                        'H': 1, 
+                                        'KH': 1000, 
+                                        'MH': 1000000, 
+                                        'GH': 1000000000
+                                    }
                                     value *= conversions.get(unit, 1)
                                     results[key] = value
                                     self.hashrate_history.append(value)
@@ -193,12 +202,18 @@ class VrscCpuMinerMonitor:
 
         # ส่วนข้อมูลผู้ใช้และ Miner
         print(f"{COLORS['bold']}{COLORS['purple']}Show settings.......{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Pool{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pools', ['ไม่ระบุ'])[0]}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Password{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['brown']}Pool{COLORS['reset']} : "
+              f"{COLORS['orange_text']}{self.config.get('pools', ['ไม่ระบุ'])[0]}{COLORS['reset']}")
         print("-" * 0)
 
         # ส่วนสถานะการขุด
@@ -209,7 +224,8 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
+        print(f"{COLORS['cyan']} RunTime [ {COLORS['green']}{hours}:"
+              f"{COLORS['yellow']}{minutes}:{COLORS['reset']}{seconds}{COLORS['reset']} ]")
 
         # ใช้ self.miner_data แทน miner_data
         if 'connection' in self.miner_data:
@@ -223,18 +239,17 @@ class VrscCpuMinerMonitor:
                 color = 'yellow'
             else:
                 color = 'red'
-            print(
-                f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
+            print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
+                  f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
 
         # แสดง difficulty
         current_diff = self.miner_data.get('difficulty')
         if current_diff is not None:
             diff_color = 'green' if current_diff < 100000 else 'brown' if current_diff < 300000 else 'yellow'
-            print(
-                f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: {COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty {COLORS['reset']}: "
+                  f"{COLORS[diff_color]}{current_diff:.2f}{COLORS['reset']}")
         else:
-            print(
-                f"  {COLORS['yellow_bg']}{COLORS['black_text']}    กำลังค้นหา... {COLORS['reset']}")
+            print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}    กำลังค้นหา... {COLORS['reset']}")
 
         # แสดง shares
         if 'accepted' in self.miner_data or 'rejected' in self.miner_data:
@@ -244,8 +259,8 @@ class VrscCpuMinerMonitor:
             ratio = (accepted / total * 100) if total > 0 else 100
 
             ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-            print(
-                f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = {COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
+            print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']} = "
+                  f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
             print(f"  {COLORS['green']}Accepted!! {accepted} {COLORS['reset']}")
             print(f"  {COLORS['red']}Rejected!! {rejected} {COLORS['reset']}")
 
