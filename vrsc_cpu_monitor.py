@@ -15,7 +15,7 @@ class VrscCpuMinerMonitor:
         self.config = self.load_config()
         self.last_difficulty = None
         self.last_update_time = None
-        self.last_lines = []  # เก็บ 2 บรรทัดล่าสุด
+        self.last_lines = []
         self.max_last_lines = 2
         self.internet_status = "กำลังตรวจสอบ..."
         self.miner_data = {
@@ -97,7 +97,6 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
-        # เพิ่มบรรทัดล่าสุดลงในรายการ
         if line.strip():
             self.last_lines.append(line.strip())
             if len(self.last_lines) > self.max_last_lines:
@@ -252,7 +251,7 @@ class VrscCpuMinerMonitor:
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner Monitor ⚡{COLORS['reset']}")
         print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        print("-" * 40)
+        print("-" * 50)
 
         # ส่วนแสดง Config
         print(f"{COLORS['bold']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
@@ -261,13 +260,13 @@ class VrscCpuMinerMonitor:
         print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
         print(f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
-        print("-" * 40)
+        print("-" * 50)
 
         # ส่วนสถานะการเชื่อมต่อ
         print(f"{COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
         print(f"  {COLORS['brown']}อินเทอร์เน็ต:{COLORS['reset']} {self.internet_status}")
         print(f"  {COLORS['brown']}สถานะพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
-        print("-" * 40)
+        print("-" * 50)
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
@@ -276,13 +275,14 @@ class VrscCpuMinerMonitor:
         print(f"{COLORS['cyan']}⏳ ล็อกล่าสุด:{COLORS['reset']}")
         for line in self.last_lines[-2:]:
             print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
+        print()
 
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"\n{COLORS['cyan']}⏱️ เวลาทำงาน: {hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
+        print(f"{COLORS['cyan']}⏱️ เวลาทำงาน: {hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
 
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
@@ -295,6 +295,20 @@ class VrscCpuMinerMonitor:
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
               f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
 
+        # แสดง difficulty
+        difficulty = self.miner_data['difficulty']
+        if difficulty > 1000000:
+            diff_color = 'red'
+            diff_str = f"{difficulty/1000000:.2f} M"
+        elif difficulty > 1000:
+            diff_color = 'yellow'
+            diff_str = f"{difficulty/1000:.2f} K"
+        else:
+            diff_color = 'green'
+            diff_str = f"{difficulty:.2f}"
+        print(f"  {COLORS['yellow_bg']}{COLORS['black_text']}Difficulty{COLORS['reset']} : "
+              f"{COLORS[diff_color]}{diff_str}{COLORS['reset']}")
+
         # แสดง shares
         accepted = self.miner_data['accepted']
         rejected = self.miner_data['rejected']
@@ -302,7 +316,7 @@ class VrscCpuMinerMonitor:
         ratio = (accepted / total * 100) if total > 0 else 100
 
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
-        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares {COLORS['reset']}: "
+        print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares{COLORS['reset']} : "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         print(f"    ├─ {COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
         print(f"    └─ {COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
