@@ -32,6 +32,17 @@ class VrscCpuMinerMonitor:
         }
         self.check_internet_connection()
 
+    def clean_log_line(self, line):
+        """ทำความสะอาดล็อกโดยลบเวลาและวันที่ที่ไม่จำเป็น"""
+        # ลบรูปแบบเวลาในวงเล็บเหลี่ยม [HH:MM:SS]
+        line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', line)
+        # ลบรูปแบบเวลาในวงเล็บ (HH:MM:SS)
+        line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', line)
+        # ลบรูปแบบวันที่-เวลา ISO (YYYY-MM-DD HH:MM:SS)
+        line = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', '', line)
+        # ลบช่องว่างที่อาจมากเกินไปหลังจากลบข้อมูล
+        return line.strip()
+
     def check_internet_connection(self):
         """ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"""
         try:
@@ -97,10 +108,13 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
+        # เพิ่มบรรทัดล่าสุดลงในรายการ (หลังจากทำความสะอาดแล้ว)
         if line.strip():
-            self.last_lines.append(line.strip())
-            if len(self.last_lines) > self.max_last_lines:
-                self.last_lines.pop(0)
+            cleaned_line = self.clean_log_line(line)
+            if cleaned_line:  # เฉพาะบรรทัดที่ไม่ว่างเปล่าหลังจากทำความสะอาด
+                self.last_lines.append(cleaned_line)
+                if len(self.last_lines) > self.max_last_lines:
+                    self.last_lines.pop(0)
 
         patterns = {
             'hashrate': [
@@ -271,7 +285,7 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
 
-        # แสดง 2 บรรทัดล่าสุดจากล็อก
+        # แสดง 2 บรรทัดล่าสุดจากล็อก (หลังจากทำความสะอาดแล้ว)
         print(f"{COLORS['cyan']}⏳ ล็อกล่าสุด:{COLORS['reset']}")
         for line in self.last_lines[-2:]:
             print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
