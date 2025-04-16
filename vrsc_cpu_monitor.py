@@ -329,7 +329,7 @@ class VrscCpuMinerMonitor:
             print(f"{COLORS['purple']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
-                print(f"  {color_code}{alert['message']}{COLORS['reset']}")
+                print(f"{color_code}{alert['message']}{COLORS['reset']}")
             print()
 
         # ส่วนสถานะการขุด
