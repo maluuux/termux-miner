@@ -33,21 +33,21 @@ class VrscCpuMinerMonitor:
         self.check_internet_connection()
 
     def clean_log_line(self, line):
-        """ทำความสะอาดล็อกโดยลบข้อมูลที่ไม่จำเป็น"""
-        # ลบรูปแบบเวลาในวงเล็บเหลี่ยม [HH:MM:SS]
-        line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', line)
-        # ลบรูปแบบเวลาในวงเล็บ (HH:MM:SS)
-        line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', line)
-        # ลบรูปแบบวันที่-เวลา ISO (YYYY-MM-DD HH:MM:SS)
-        line = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', '', line)
-        # ลบคำที่แสดงอยู่แล้วใน dashboard
-        line = re.sub(r'(hashrate|speed|difficulty|diff|accepted|rejected|block):?\s*', '', line, flags=re.IGNORECASE)
-        # ลบค่าที่เป็นตัวเลขล้วน (อาจเป็นค่าที่แสดงแล้ว)
-        line = re.sub(r'\b\d+\b', '', line)
-        # ลบสัญลักษณ์พิเศษ
-        line = re.sub(r'[\[\]\(\)\{\}]', '', line)
-        # ลบช่องว่างที่อาจมากเกินไปหลังจากลบข้อมูล
-        return line.strip()
+        """ทำความสะอาดล็อกโดยกรองเฉพาะข้อความสำคัญ"""
+        # กรองเฉพาะข้อความแจ้งเตือนปัญหาหรือข้อมูล CPU temperature
+        if re.search(r'(error|fail|warning|disconnect|reject|timeout|cpu temp|temperature|overheat|over load|high load|ปัญหา|ขัดข้อง)', line, re.IGNORECASE):
+            # ลบรูปแบบเวลาและวันที่
+            line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', line)
+            line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', line)
+            line = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', '', line)
+            return line.strip()
+        
+        # กรองข้อมูล CPU temperature
+        cpu_temp_match = re.search(r'CPU T(emp)?.*?:\s*(\d+\.?\d*)\s*°?C', line, re.IGNORECASE)
+        if cpu_temp_match:
+            return f"อุณหภูมิ CPU: {cpu_temp_match.group(2)}°C"
+            
+        return None
 
     def check_internet_connection(self):
         """ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"""
@@ -114,13 +114,12 @@ class VrscCpuMinerMonitor:
         return default_config
 
     def parse_miner_output(self, line):
-        # เพิ่มบรรทัดล่าสุดลงในรายการ (หลังจากทำความสะอาดแล้ว)
-        if line.strip():
-            cleaned_line = self.clean_log_line(line)
-            if cleaned_line:  # เฉพาะบรรทัดที่ไม่ว่างเปล่าหลังจากทำความสะอาด
-                self.last_lines.append(cleaned_line)
-                if len(self.last_lines) > self.max_last_lines:
-                    self.last_lines.pop(0)
+        # เพิ่มบรรทัดล่าสุดลงในรายการ (เฉพาะข้อความสำคัญ)
+        cleaned_line = self.clean_log_line(line)
+        if cleaned_line:
+            self.last_lines.append(cleaned_line)
+            if len(self.last_lines) > self.max_last_lines:
+                self.last_lines.pop(0)
 
         patterns = {
             'hashrate': [
@@ -291,12 +290,21 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
 
-        # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อมูลใหม่)
+        # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อความแจ้งเตือน)
         if self.last_lines:
-            print(f"{COLORS['cyan']}📌 ข้อมูลล่าสุด:{COLORS['reset']}")
+            print(f"{COLORS['cyan']}🚨 แจ้งเตือน:{COLORS['reset']}")
             for line in self.last_lines[-2:]:
-                if line:  # แสดงเฉพาะบรรทัดที่ไม่ว่าง
-                    print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
+                if 'อุณหภูมิ CPU' in line:
+                    temp = float(re.search(r'(\d+\.?\d*)°C', line).group(1))
+                    if temp > 80:
+                        color = COLORS['red']
+                    elif temp > 70:
+                        color = COLORS['yellow']
+                    else:
+                        color = COLORS['green']
+                    print(f"  {color}{line}{COLORS['reset']}")
+                else:
+                    print(f"  {COLORS['red']}{line}{COLORS['reset']}")
             print()
 
         # ส่วนรันไทม์
