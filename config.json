@@ -1,8 +1,8 @@
 {
  "pools":
         [{
-            "name": "US-VIPOR",
-            "url": "stratum+tcp://us.vipor.net:5040",
+            "name": "SG-VIPOR",
+            "url": "stratum+tcp://sg.vipor.net:5040",
             "timeout": 180,
             "disabled": 0
         }],
