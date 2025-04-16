@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 import json
 import os
-import requests
 import threading
 
 
@@ -18,7 +17,8 @@ class VrscCpuMinerMonitor:
         self.last_update_time = None
         self.last_lines = []
         self.max_last_lines = 2
-        self.internet_status = "กำลังตรวจสอบ..."
+        self.alert_messages = []
+        self.running = True
         self.miner_data = {
             'hashrate': 0,
             'difficulty': 0,
@@ -31,66 +31,50 @@ class VrscCpuMinerMonitor:
             },
             'block': 0
         }
-        self.alert_messages = []
-        self.running = True
-        self.check_interval = 30  # ตรวจสอบทุก 30 วินาที
-        self.start_background_checks()
-
-    def start_background_checks(self):
-        """เริ่มการตรวจสอบพื้นหลัง"""
-        def internet_check_loop():
-            while self.running:
-                self.check_internet_connection()
-                time.sleep(self.check_interval)
-
-        # เริ่มเธรดสำหรับตรวจสอบอินเทอร์เน็ต
-        internet_thread = threading.Thread(target=internet_check_loop)
-        internet_thread.daemon = True
-        internet_thread.start()
 
     def clean_log_line(self, line):
-        """ทำความสะอาดล็อกโดยกรองเฉพาะข้อความสำคัญ"""
-        # กรองเฉพาะข้อความแจ้งเตือนปัญหาหรือข้อมูล CPU temperature
-        line_lower = line.lower()
-        if any(keyword in line_lower for keyword in [
-            'error', 'fail', 'warning', 'disconnect', 
-            'reject', 'timeout', 'cpu temp', 'temperature',
-            'overheat', 'over load', 'high load', 'ปัญหา', 
-            'ขัดข้อง', 'connection lost', 'stratum error'
-        ]):
-            # ลบรูปแบบเวลาและวันที่
-            line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', line)
-            line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', line)
-            line = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', '', line)
-            return line.strip()
+        """ตรวจสอบและคัดกรองข้อความแจ้งเตือนจาก CC Miner"""
+        # ตรวจสอบข้อความแจ้งเตือนสีแดง (ERROR)
+        red_alert = re.search(r'\x1b\[31m(.*?)\x1b\[0m', line)
+        if red_alert:
+            return ('red', red_alert.group(1).strip())
         
-        # กรองข้อมูล CPU temperature
-        cpu_temp_match = re.search(r'CPU T(emp)?.*?:\s*(\d+\.?\d*)\s*°?C', line, re.IGNORECASE)
-        if cpu_temp_match:
-            return f"อุณหภูมิ CPU: {cpu_temp_match.group(2)}°C"
+        # ตรวจสอบข้อความแจ้งเตือนสีเหลือง (WARNING)
+        yellow_alert = re.search(r'\x1b\[33m(.*?)\x1b\[0m', line)
+        if yellow_alert:
+            return ('yellow', yellow_alert.group(1).strip())
+        
+        # ตรวจสอบข้อความสำคัญอื่นๆ
+        important_messages = [
+            'error', 'fail', 'warning', 'disconnect', 
+            'reject', 'timeout', 'disconnected', 'connection lost',
+            'stratum error', 'invalid share', 'high temperature',
+            'retry', 'failed', 'disconnected from', 'network error'
+        ]
+        
+        line_lower = line.lower()
+        if any(msg in line_lower for msg in important_messages):
+            # ลบรหัสสีและ timestamp
+            clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)  # ลบ ANSI color codes
+            clean_line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', clean_line)  # ลบ timestamp
+            clean_line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', clean_line)  # ลบ timestamp แบบอื่น
+            return ('yellow', clean_line.strip())
             
         return None
 
-    def check_internet_connection(self):
-        """ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"""
-        try:
-            requests.get('https://www.google.com', timeout=10)
-            new_status = "✅ ออนไลน์"
-        except:
-            new_status = "❌ ออฟไลน์"
-        
-        if new_status != self.internet_status:
-            self.internet_status = new_status
-            if new_status == "❌ ออฟไลน์":
-                self.add_alert_message("การเชื่อมต่ออินเทอร์เน็ตขาดหาย")
-            return True
-        return False
-
-    def add_alert_message(self, message):
-        """เพิ่มข้อความแจ้งเตือน"""
+    def add_alert_message(self, color, message):
+        """เพิ่มข้อความแจ้งเตือนพร้อมระบุสี"""
+        if not message or len(message) > 200:  # จำกัดความยาวข้อความ
+            return
+            
         timestamp = datetime.now().strftime('%H:%M:%S')
-        self.alert_messages.append(f"[{timestamp}] {message}")
-        if len(self.alert_messages) > 5:  # เก็บเฉพาะ 5 ข้อความล่าสุด
+        self.alert_messages.append({
+            'color': color,
+            'message': f"[{timestamp}] {message}",
+            'time': time.time()
+        })
+        # เก็บเฉพาะ 5 ข้อความล่าสุด
+        if len(self.alert_messages) > 5:
             self.alert_messages.pop(0)
 
     def load_config(self):
@@ -145,21 +129,19 @@ class VrscCpuMinerMonitor:
                         default_config.update(loaded_config)
                     break
         except Exception as e:
-            self.add_alert_message(f"ไม่สามารถโหลด config ได้: {str(e)}")
+            self.add_alert_message('red', f"ไม่สามารถโหลด config ได้: {str(e)}")
 
         return default_config
 
     def parse_miner_output(self, line):
-        # เพิ่มบรรทัดล่าสุดลงในรายการ (เฉพาะข้อความสำคัญ)
-        cleaned_line = self.clean_log_line(line)
-        if cleaned_line:
-            self.last_lines.append(cleaned_line)
-            if len(self.last_lines) > self.max_last_lines:
-                self.last_lines.pop(0)
-            
-            # เพิ่มข้อความแจ้งเตือนหากพบปัญหา
-            if any(keyword in cleaned_line.lower() for keyword in ['error', 'fail', 'warning', 'disconnect']):
-                self.add_alert_message(cleaned_line)
+        updated = False
+
+        # ตรวจสอบและเพิ่มข้อความแจ้งเตือน
+        alert = self.clean_log_line(line)
+        if alert:
+            color, message = alert
+            self.add_alert_message(color, message)
+            updated = True
 
         patterns = {
             'hashrate': [
@@ -189,8 +171,6 @@ class VrscCpuMinerMonitor:
                 re.compile(r'connecting to:\s*(.*)', re.IGNORECASE)
             ]
         }
-
-        updated = False
 
         # หาค่า difficulty
         for pattern in patterns['difficulty']:
@@ -270,11 +250,11 @@ class VrscCpuMinerMonitor:
                         if 'connected' in line.lower():
                             new_status = "✅ เชื่อมต่อแล้ว"
                             if self.miner_data['connection']['status'] != new_status:
-                                self.add_alert_message("เชื่อมต่อพูลแล้ว")
+                                self.add_alert_message('green', "เชื่อมต่อพูลแล้ว")
                         elif 'connecting' in line.lower():
                             new_status = "🔄 กำลังเชื่อมต่อ"
                             if self.miner_data['connection']['status'] != new_status:
-                                self.add_alert_message("กำลังเชื่อมต่อพูล...")
+                                self.add_alert_message('yellow', "กำลังเชื่อมต่อพูล...")
                         else:
                             new_status = self.miner_data['connection']['status']
 
@@ -287,7 +267,7 @@ class VrscCpuMinerMonitor:
 
         # ตรวจสอบการหยุดทำงานของ miner
         if "miner stopped" in line.lower() or "miner exited" in line.lower():
-            self.add_alert_message("เครื่องขุดหยุดทำงาน!")
+            self.add_alert_message('red', "เครื่องขุดหยุดทำงาน!")
             updated = True
 
         return updated
@@ -325,6 +305,18 @@ class VrscCpuMinerMonitor:
         print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         print("-" * 50)
 
+        # ส่วนแสดงแจ้งเตือน (แสดงบนสุด)
+        current_time = time.time()
+        recent_alerts = [alert for alert in self.alert_messages 
+                        if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
+        
+        if recent_alerts:
+            print(f"{COLORS['bold']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
+            for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
+                color_code = COLORS[alert['color']]
+                print(f"  {color_code}{alert['message']}{COLORS['reset']}")
+            print()
+
         # ส่วนแสดง Config
         print(f"{COLORS['bold']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
         print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
@@ -336,35 +328,17 @@ class VrscCpuMinerMonitor:
 
         # ส่วนสถานะการเชื่อมต่อ
         print(f"{COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
-        print(f"  {COLORS['brown']}อินเทอร์เน็ต:{COLORS['reset']} {self.internet_status}")
         print(f"  {COLORS['brown']}สถานะพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
         print("-" * 50)
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
 
-        # แสดงข้อความแจ้งเตือน (ถ้ามี)
-        if self.alert_messages:
-            print(f"{COLORS['red']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
-            for alert in self.alert_messages[-2:]:  # แสดง 2 ข้อความล่าสุด
-                print(f"  {COLORS['red']}{alert}{COLORS['reset']}")
-            print()
-
         # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อความสำคัญ)
         if self.last_lines:
             print(f"{COLORS['cyan']}📌 ข้อมูลล่าสุด:{COLORS['reset']}")
             for line in self.last_lines[-2:]:
-                if 'อุณหภูมิ CPU' in line:
-                    temp = float(re.search(r'(\d+\.?\d*)°C', line).group(1))
-                    if temp > 80:
-                        color = COLORS['red']
-                    elif temp > 70:
-                        color = COLORS['yellow']
-                    else:
-                        color = COLORS['green']
-                    print(f"  {color}{line}{COLORS['reset']}")
-                else:
-                    print(f"  {COLORS['Light_Gray']}{line}{COLORS['reset']}")
+                print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
             print()
 
         # ส่วนรันไทม์
@@ -432,7 +406,7 @@ class VrscCpuMinerMonitor:
             print("\nกำลังหยุดการตรวจสอบ...")
             self.running = False
         except Exception as e:
-            self.add_alert_message(f"เกิดข้อผิดพลาด: {str(e)}")
+            self.add_alert_message('red', f"เกิดข้อผิดพลาด: {str(e)}")
             print(f"\nเกิดข้อผิดพลาด: {e}")
             self.running = False
         finally:
