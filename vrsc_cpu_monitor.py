@@ -318,7 +318,7 @@ class VrscCpuMinerMonitor:
             print()
 
         # ส่วนแสดง Config
-        print(f"{COLORS['purple']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
+        print(f"{COLORS['blue']}{COLORS['purple']}=== การตั้งค่า ==={COLORS['reset']}")
         print(
             f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
@@ -331,7 +331,7 @@ class VrscCpuMinerMonitor:
             f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
 
         # ส่วนสถานะการเชื่อมต่อ
-        print(f"  {COLORS['brown']}สถานะการเชื่อมต่อพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
+        print(f"  {COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         print("-" * 50)
 
         # ส่วนสถานะการขุด
@@ -352,7 +352,7 @@ class VrscCpuMinerMonitor:
         else:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}🚀 🚀")
+              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
 
         # แสดง difficulty
         difficulty = self.miner_data['difficulty']
