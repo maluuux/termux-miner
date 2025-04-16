@@ -19,6 +19,7 @@ class VrscCpuMinerMonitor:
         self.max_last_lines = 2
         self.alert_messages = []
         self.running = True
+        self.cpu_threads = {}  # Dictionary to store CPU thread information
         self.miner_data = {
             'hashrate': 0,
             'difficulty': 0,
@@ -29,7 +30,8 @@ class VrscCpuMinerMonitor:
                 'pool': self.config.get('pools', ['ไม่ระบุ'])[0],
                 'url': 'ไม่ระบุ'
             },
-            'block': 0
+            'block': 0,
+            'cpu_threads': {}  # Store CPU thread performance data
         }
 
     def clean_log_line(self, line):
@@ -169,7 +171,8 @@ class VrscCpuMinerMonitor:
                 re.compile(r'pool:\s*(.*)', re.IGNORECASE),
                 re.compile(r'stratum:\s*(.*)', re.IGNORECASE),
                 re.compile(r'connecting to:\s*(.*)', re.IGNORECASE)
-            ]
+            ],
+            'cpu_thread': re.compile(r'CPU T(\d+)\s*:\s*([\d.]+)\s*H/s', re.IGNORECASE)
         }
 
         # หาค่า difficulty
@@ -269,6 +272,17 @@ class VrscCpuMinerMonitor:
         if "miner stopped" in line.lower() or "miner exited" in line.lower():
             self.add_alert_message('red', "เครื่องขุดหยุดทำงาน!")
             updated = True
+            
+        # หาค่า CPU thread performance
+        cpu_thread_match = patterns['cpu_thread'].search(line)
+        if cpu_thread_match:
+            try:
+                thread_num = int(cpu_thread_match.group(1))
+                thread_hashrate = float(cpu_thread_match.group(2))
+                self.miner_data['cpu_threads'][thread_num] = thread_hashrate
+                updated = True
+            except (ValueError, IndexError):
+                pass
 
         return updated
 
@@ -279,6 +293,38 @@ class VrscCpuMinerMonitor:
         elif hashrate >= 1000:
             return f"{hashrate / 1000:.2f} kH/s"
         return f"{hashrate:.2f} H/s"
+
+    def display_cpu_threads(self, COLORS):
+        """แสดงผล CPU threads ในรูปแบบ progress bar"""
+        if not self.miner_data['cpu_threads']:
+            return
+            
+        print(f"\n{COLORS['bold']}{COLORS['purple']}=== สถานะ CPU Threads ==={COLORS['reset']}")
+        
+        # เรียงลำดับ thread
+        sorted_threads = sorted(self.miner_data['cpu_threads'].items())
+        
+        # หาค่า hashrate สูงสุดสำหรับ normalization
+        max_hashrate = max(self.miner_data['cpu_threads'].values()) if self.miner_data['cpu_threads'] else 1
+        
+        for thread_num, hashrate in sorted_threads:
+            # คำนวณความยาว progress bar (0-20)
+            bar_length = 20
+            filled_length = int(round(hashrate / max_hashrate * bar_length)) if max_hashrate > 0 else 0
+            filled_length = min(max(filled_length, 0), bar_length)
+            
+            # สร้าง progress bar
+            bar = '█' * filled_length + '-' * (bar_length - filled_length)
+            
+            # เลือกสีตามประสิทธิภาพ
+            if hashrate >= max_hashrate * 0.8:
+                color = COLORS['green']
+            elif hashrate >= max_hashrate * 0.5:
+                color = COLORS['yellow']
+            else:
+                color = COLORS['red']
+                
+            print(f"  {COLORS['cyan']}Thread {thread_num:2d}: {color}{bar} {COLORS['reset']}{hashrate:6.2f} H/s")
 
     def display_dashboard(self):
         """แสดงผลข้อมูลการขุด"""
@@ -379,6 +425,9 @@ class VrscCpuMinerMonitor:
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         print(f"    {COLORS['bold']}{COLORS['orange_text']}├─ {COLORS['reset']}{COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
         print(f"    {COLORS['bold']}{COLORS['orange_text']}└─ {COLORS['reset']}{COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
+
+        # แสดง CPU threads
+        self.display_cpu_threads(COLORS)
 
     def run(self):
         try:
