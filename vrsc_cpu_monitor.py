@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import os
 import requests
+import threading
 
 
 class VrscCpuMinerMonitor:
@@ -30,12 +31,33 @@ class VrscCpuMinerMonitor:
             },
             'block': 0
         }
-        self.check_internet_connection()
+        self.alert_messages = []
+        self.running = True
+        self.check_interval = 30  # ตรวจสอบทุก 30 วินาที
+        self.start_background_checks()
+
+    def start_background_checks(self):
+        """เริ่มการตรวจสอบพื้นหลัง"""
+        def internet_check_loop():
+            while self.running:
+                self.check_internet_connection()
+                time.sleep(self.check_interval)
+
+        # เริ่มเธรดสำหรับตรวจสอบอินเทอร์เน็ต
+        internet_thread = threading.Thread(target=internet_check_loop)
+        internet_thread.daemon = True
+        internet_thread.start()
 
     def clean_log_line(self, line):
         """ทำความสะอาดล็อกโดยกรองเฉพาะข้อความสำคัญ"""
         # กรองเฉพาะข้อความแจ้งเตือนปัญหาหรือข้อมูล CPU temperature
-        if re.search(r'(error|fail|warning|disconnect|reject|timeout|cpu temp|temperature|overheat|over load|high load|ปัญหา|ขัดข้อง)', line, re.IGNORECASE):
+        line_lower = line.lower()
+        if any(keyword in line_lower for keyword in [
+            'error', 'fail', 'warning', 'disconnect', 
+            'reject', 'timeout', 'cpu temp', 'temperature',
+            'overheat', 'over load', 'high load', 'ปัญหา', 
+            'ขัดข้อง', 'connection lost', 'stratum error'
+        ]):
             # ลบรูปแบบเวลาและวันที่
             line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', line)
             line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', line)
@@ -52,10 +74,24 @@ class VrscCpuMinerMonitor:
     def check_internet_connection(self):
         """ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"""
         try:
-            requests.get('https://www.google.com', timeout=5)
-            self.internet_status = "✅ ออนไลน์"
+            requests.get('https://www.google.com', timeout=10)
+            new_status = "✅ ออนไลน์"
         except:
-            self.internet_status = "❌ ออฟไลน์"
+            new_status = "❌ ออฟไลน์"
+        
+        if new_status != self.internet_status:
+            self.internet_status = new_status
+            if new_status == "❌ ออฟไลน์":
+                self.add_alert_message("การเชื่อมต่ออินเทอร์เน็ตขาดหาย")
+            return True
+        return False
+
+    def add_alert_message(self, message):
+        """เพิ่มข้อความแจ้งเตือน"""
+        timestamp = datetime.now().strftime('%H:%M:%S')
+        self.alert_messages.append(f"[{timestamp}] {message}")
+        if len(self.alert_messages) > 5:  # เก็บเฉพาะ 5 ข้อความล่าสุด
+            self.alert_messages.pop(0)
 
     def load_config(self):
         default_config = {
@@ -109,7 +145,7 @@ class VrscCpuMinerMonitor:
                         default_config.update(loaded_config)
                     break
         except Exception as e:
-            print(f"ไม่สามารถโหลด config ได้: {e}")
+            self.add_alert_message(f"ไม่สามารถโหลด config ได้: {str(e)}")
 
         return default_config
 
@@ -120,6 +156,10 @@ class VrscCpuMinerMonitor:
             self.last_lines.append(cleaned_line)
             if len(self.last_lines) > self.max_last_lines:
                 self.last_lines.pop(0)
+            
+            # เพิ่มข้อความแจ้งเตือนหากพบปัญหา
+            if any(keyword in cleaned_line.lower() for keyword in ['error', 'fail', 'warning', 'disconnect']):
+                self.add_alert_message(cleaned_line)
 
         patterns = {
             'hashrate': [
@@ -228,14 +268,27 @@ class VrscCpuMinerMonitor:
                 if match:
                     try:
                         if 'connected' in line.lower():
-                            self.miner_data['connection']['status'] = "✅ เชื่อมต่อแล้ว"
-                            updated = True
+                            new_status = "✅ เชื่อมต่อแล้ว"
+                            if self.miner_data['connection']['status'] != new_status:
+                                self.add_alert_message("เชื่อมต่อพูลแล้ว")
                         elif 'connecting' in line.lower():
-                            self.miner_data['connection']['status'] = "🔄 กำลังเชื่อมต่อ"
+                            new_status = "🔄 กำลังเชื่อมต่อ"
+                            if self.miner_data['connection']['status'] != new_status:
+                                self.add_alert_message("กำลังเชื่อมต่อพูล...")
+                        else:
+                            new_status = self.miner_data['connection']['status']
+
+                        if new_status != self.miner_data['connection']['status']:
+                            self.miner_data['connection']['status'] = new_status
                             updated = True
                         break
                     except:
                         continue
+
+        # ตรวจสอบการหยุดทำงานของ miner
+        if "miner stopped" in line.lower() or "miner exited" in line.lower():
+            self.add_alert_message("เครื่องขุดหยุดทำงาน!")
+            updated = True
 
         return updated
 
@@ -290,9 +343,16 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
 
-        # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อความแจ้งเตือน)
+        # แสดงข้อความแจ้งเตือน (ถ้ามี)
+        if self.alert_messages:
+            print(f"{COLORS['red']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
+            for alert in self.alert_messages[-2:]:  # แสดง 2 ข้อความล่าสุด
+                print(f"  {COLORS['red']}{alert}{COLORS['reset']}")
+            print()
+
+        # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อความสำคัญ)
         if self.last_lines:
-            print(f"{COLORS['cyan']}🚨 แจ้งเตือน:{COLORS['reset']}")
+            print(f"{COLORS['cyan']}📌 ข้อมูลล่าสุด:{COLORS['reset']}")
             for line in self.last_lines[-2:]:
                 if 'อุณหภูมิ CPU' in line:
                     temp = float(re.search(r'(\d+\.?\d*)°C', line).group(1))
@@ -304,7 +364,7 @@ class VrscCpuMinerMonitor:
                         color = COLORS['green']
                     print(f"  {color}{line}{COLORS['reset']}")
                 else:
-                    print(f"  {COLORS['red']}{line}{COLORS['reset']}")
+                    print(f"  {COLORS['Light_Gray']}{line}{COLORS['reset']}")
             print()
 
         # ส่วนรันไทม์
@@ -370,8 +430,11 @@ class VrscCpuMinerMonitor:
 
         except KeyboardInterrupt:
             print("\nกำลังหยุดการตรวจสอบ...")
+            self.running = False
         except Exception as e:
+            self.add_alert_message(f"เกิดข้อผิดพลาด: {str(e)}")
             print(f"\nเกิดข้อผิดพลาด: {e}")
+            self.running = False
         finally:
             if 'process' in locals():
                 process.terminate()
