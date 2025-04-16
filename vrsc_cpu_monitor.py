@@ -38,20 +38,20 @@ class VrscCpuMinerMonitor:
         red_alert = re.search(r'\x1b\[31m(.*?)\x1b\[0m', line)
         if red_alert:
             return ('red', red_alert.group(1).strip())
-        
+
         # ตรวจสอบข้อความแจ้งเตือนสีเหลือง (WARNING)
         yellow_alert = re.search(r'\x1b\[33m(.*?)\x1b\[0m', line)
         if yellow_alert:
             return ('yellow', yellow_alert.group(1).strip())
-        
+
         # ตรวจสอบข้อความสำคัญอื่นๆ
         important_messages = [
-            'error', 'fail', 'warning', 'disconnect', 
+            'error', 'fail', 'warning', 'disconnect',
             'reject', 'timeout', 'disconnected', 'connection lost',
             'stratum error', 'invalid share', 'high temperature',
             'retry', 'failed', 'disconnected from', 'network error'
         ]
-        
+
         line_lower = line.lower()
         if any(msg in line_lower for msg in important_messages):
             # ลบรหัสสีและ timestamp
@@ -59,14 +59,14 @@ class VrscCpuMinerMonitor:
             clean_line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', clean_line)  # ลบ timestamp
             clean_line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', clean_line)  # ลบ timestamp แบบอื่น
             return ('yellow', clean_line.strip())
-            
+
         return None
 
     def add_alert_message(self, color, message):
         """เพิ่มข้อความแจ้งเตือนพร้อมระบุสี"""
         if not message or len(message) > 200:  # จำกัดความยาวข้อความ
             return
-            
+
         timestamp = datetime.now().strftime('%H:%M:%S')
         self.alert_messages.append({
             'color': color,
@@ -107,7 +107,7 @@ class VrscCpuMinerMonitor:
                         loaded_config = json.load(f)
 
                         wallet = loaded_config.get('wallet_address',
-                                               loaded_config.get('user', 'ไม่ระบุ'))
+                                                   loaded_config.get('user', 'ไม่ระบุ'))
                         if '.' in wallet:
                             base_wallet, miner_name = wallet.rsplit('.', 1)
                             loaded_config['base_wallet'] = base_wallet
@@ -307,40 +307,35 @@ class VrscCpuMinerMonitor:
 
         # ส่วนแสดงแจ้งเตือน (แสดงบนสุด)
         current_time = time.time()
-        recent_alerts = [alert for alert in self.alert_messages 
-                        if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
-        
+        recent_alerts = [alert for alert in self.alert_messages
+                         if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
+
         if recent_alerts:
-            print(f"{COLORS['bold']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
+            print(f"{COLORS['bold']}{COLORS['purple']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
                 print(f"  {color_code}{alert['message']}{COLORS['reset']}")
             print()
 
         # ส่วนแสดง Config
-        print(f"{COLORS['bold']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
-        print(f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
-        print("-" * 50)
+        print(f"{COLORS['purple']}{COLORS['blue']}=== การตั้งค่า ==={COLORS['reset']}")
+        print(
+            f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
 
         # ส่วนสถานะการเชื่อมต่อ
-        print(f"{COLORS['bold']}{COLORS['blue']}=== สถานะการเชื่อมต่อ ==={COLORS['reset']}")
-        print(f"  {COLORS['brown']}สถานะพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
+        print(f"  {COLORS['brown']}สถานะการเชื่อมต่อพูล:{COLORS['reset']} {self.miner_data['connection']['status']}")
         print("-" * 50)
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
-
-        # แสดง 2 บรรทัดล่าสุดจากล็อก (เฉพาะข้อความสำคัญ)
-        if self.last_lines:
-            print(f"{COLORS['cyan']}📌 ข้อมูลล่าสุด:{COLORS['reset']}")
-            for line in self.last_lines[-2:]:
-                print(f"  {COLORS['Light_Gray']}{line[:80]}{'...' if len(line) > 80 else ''}{COLORS['reset']}")
-            print()
-
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
@@ -357,16 +352,16 @@ class VrscCpuMinerMonitor:
         else:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}")
+              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']}🚀 🚀")
 
         # แสดง difficulty
         difficulty = self.miner_data['difficulty']
         if difficulty > 1000000:
             diff_color = 'red'
-            diff_str = f"{difficulty/1000000:.2f} M"
+            diff_str = f"{difficulty / 1000000:.2f} M"
         elif difficulty > 1000:
             diff_color = 'yellow'
-            diff_str = f"{difficulty/1000:.2f} K"
+            diff_str = f"{difficulty / 1000:.2f} K"
         else:
             diff_color = 'green'
             diff_str = f"{difficulty:.2f}"
@@ -382,8 +377,8 @@ class VrscCpuMinerMonitor:
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
         print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares{COLORS['reset']} : "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-        print(f"    ├─ {COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
-        print(f"    └─ {COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
+        print(f"    {COLORS['bold']}{COLORS['orange_text']}├─ {COLORS['reset']}{COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
+        print(f"    {COLORS['bold']}{COLORS['orange_text']}└─ {COLORS['reset']}{COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
 
     def run(self):
         try:
