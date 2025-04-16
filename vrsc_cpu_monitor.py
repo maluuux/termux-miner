@@ -303,39 +303,37 @@ class VrscCpuMinerMonitor:
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner Monitor ⚡{COLORS['reset']}")
         print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        print("-" * 50)
 
-        # ส่วนแสดงแจ้งเตือน (แสดงบนสุด)
+        # ส่วนแสดง Config
+        print(f"{COLORS['blue']}{COLORS['purple']}=== การตั้งค่า ==={COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+
+        # ส่วนสถานะการเชื่อมต่อ
+        print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
+
+        # ส่วนแสดงแจ้งเตือน
         current_time = time.time()
         recent_alerts = [alert for alert in self.alert_messages
                          if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
 
         if recent_alerts:
-            print(f"{COLORS['bold']}{COLORS['purple']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
+            print(f"{COLORS['purple']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
                 print(f"  {color_code}{alert['message']}{COLORS['reset']}")
             print()
 
-        # ส่วนแสดง Config
-        print(f"{COLORS['blue']}{COLORS['purple']}=== การตั้งค่า ==={COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
-            f"  {COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
-
-        # ส่วนสถานะการเชื่อมต่อ
-        print(f"  {COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
-        print("-" * 50)
-
         # ส่วนสถานะการขุด
-        print(f"{COLORS['bold']}{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
+        print(f"{COLORS['purple']}=== สถานะการขุด ==={COLORS['reset']}")
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
