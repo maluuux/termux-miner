@@ -369,7 +369,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['white_bg']}{COLORS['black_text']}⏱️ เวลาทำงาน{COLORS['reset']} : {COLORS['cyan']}{hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
+        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Run time{COLORS['reset']} : {COLORS['cyan']}{hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
 
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
