@@ -23,11 +23,11 @@ class VrscCpuMinerMonitor:
     def show_menu(self):
         """แสดงเมนูหลัก"""
         while True:
-            print("\n" + "="*40)
-            print("VRSC CPU Miner Monitor")
-            print("="*40)
-            print("1. เริ่มการขุด (run)")
-            print("2. แก้ไข config (edit)")
+            print("\n" + "="*30)
+            print(f"{COLORS['purple']}VRSC CPU Miner{COLORS['reset']}[{COLORS['green']}run{COLORS['reset']}|{COLORS['orange_text']}edit{COLORS['reset']}]")
+            print("="*30)
+            print(f"{COLORS['green']}1. เริ่มการขุด (run){COLORS['reset']}")
+            print(f"{COLORS['orange_text']}2. แก้ไข config (edit){COLORS['reset']}")
             print("3. ออกจากโปรแกรม")
             
             choice = input("เลือกตัวเลือก: ").strip()
@@ -447,6 +447,6 @@ if __name__ == "__main__":
         elif sys.argv[1] == "edit":
             monitor.edit_config()
         else:
-            print("คำสั่งไม่ถูกต้อง ใช้: python vrsc_cpu_monitor.py [run|edit]")
+            print("คำสั่งไม่ถูกต้อง [run|edit]")
     else:
         monitor.show_menu()
