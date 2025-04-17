@@ -318,9 +318,6 @@ class VrscCpuMinerMonitor:
         print(
             f"{COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
 
-        # ส่วนสถานะการเชื่อมต่อ
-        print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
-
         # ส่วนแสดงแจ้งเตือน
         current_time = time.time()
         recent_alerts = [alert for alert in self.alert_messages
@@ -378,6 +375,7 @@ class VrscCpuMinerMonitor:
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
         print(f"    {COLORS['bold']}{COLORS['orange_text']}├─ {COLORS['reset']}{COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
         print(f"    {COLORS['bold']}{COLORS['orange_text']}└─ {COLORS['reset']}{COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
+        
 
     def run(self):
         try:
