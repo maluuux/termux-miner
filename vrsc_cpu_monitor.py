@@ -301,11 +301,9 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner Monitor ⚡{COLORS['reset']}")
-        print(f"   {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ...{COLORS['reset']} {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
 
         # ส่วนแสดง Config
-        print(f"{COLORS['blue']}{COLORS['purple']}=== การตั้งค่า ==={COLORS['reset']}")
         print(
             f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
