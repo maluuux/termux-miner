@@ -334,7 +334,8 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ... ⚡{COLORS['reset']} {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ... ⚡{COLORS['reset']}")
+        print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         # ส่วนสถานะการเชื่อมต่อ
         print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
@@ -368,7 +369,7 @@ class VrscCpuMinerMonitor:
         hours = runtime // 3600
         minutes = (runtime % 3600) // 60
         seconds = runtime % 60
-        print(f"{COLORS['cyan']}⏱️ เวลาทำงาน: {hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
+        print(f"{COLORS['white_bg']}{COLORS['black_text']}⏱️ เวลาทำงาน{COLORS['reset']} : {COLORS['cyan']}{hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
 
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
