@@ -9,6 +9,21 @@ import sys
 
 
 class VrscCpuMinerMonitor:
+
+    COLORS = {
+            'green': '\033[92m', 'yellow': '\033[93m',
+            'red': '\033[91m', 'blue': '\033[94m',
+            'cyan': '\033[96m', 'purple': '\033[95m',
+            'reset': '\033[0m', 'bold': '\033[1m',
+            'brown': '\033[33m',
+            'Light_Gray': '\033[37m',
+            'yellow_bg': '\033[43m',
+            'green_bg': '\033[42m',
+            'orange_bg': '\033[48;5;208m',
+            'black_text': '\033[30m',
+            'white_bg': '\033[48;5;15m',
+            'orange_text': '\033[38;5;208m'
+        }
     def edit_config(self):
         """แก้ไขไฟล์ config.json"""
         config_path = os.path.expanduser('~/ccminer/config.json')
@@ -315,20 +330,7 @@ class VrscCpuMinerMonitor:
 
     def display_dashboard(self):
         """แสดงผลข้อมูลการขุด"""
-        COLORS = {
-            'green': '\033[92m', 'yellow': '\033[93m',
-            'red': '\033[91m', 'blue': '\033[94m',
-            'cyan': '\033[96m', 'purple': '\033[95m',
-            'reset': '\033[0m', 'bold': '\033[1m',
-            'brown': '\033[33m',
-            'Light_Gray': '\033[37m',
-            'yellow_bg': '\033[43m',
-            'green_bg': '\033[42m',
-            'orange_bg': '\033[48;5;208m',
-            'black_text': '\033[30m',
-            'white_bg': '\033[48;5;15m',
-            'orange_text': '\033[38;5;208m'
-        }
+        
 
         # ล้างหน้าจอ
         print("\033[2J\033[H", end="")
