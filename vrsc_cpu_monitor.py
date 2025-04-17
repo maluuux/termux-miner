@@ -8,6 +8,38 @@ import threading
 
 
 class VrscCpuMinerMonitor:
+    def edit_config(self):
+        """แก้ไขไฟล์ config.json"""
+        config_path = os.path.expanduser('~/config.json')
+        
+        try:
+            subprocess.run(['nano', config_path])
+            print("✅ แก้ไขไฟล์ config เรียบร้อยแล้ว")
+            self.config = self.load_config()
+        except Exception as e:
+            print(f"⚠️ เกิดข้อผิดพลาด: {str(e)}")
+
+    def show_menu(self):
+        """แสดงเมนูหลัก"""
+        while True:
+            print("\n" + "="*40)
+            print("VRSC CPU Miner Monitor")
+            print("="*40)
+            print("1. เริ่มการขุด (run)")
+            print("2. แก้ไข config (edit)")
+            print("3. ออกจากโปรแกรม")
+            
+            choice = input("เลือกตัวเลือก: ").strip()
+            
+            if choice == "1":
+                self.run()
+            elif choice == "2":
+                self.edit_config()
+            elif choice == "3":
+                print("ปิดโปรแกรม...")
+                break
+            else:
+                print("⚠️ โปรดเลือกตัวเลือกที่ถูกต้อง")
     def __init__(self):
         self.hashrate_history = []
         self.start_time = time.time()
@@ -301,11 +333,7 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ...{COLORS['reset']} {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
-        # คำสั่งต่างๆ
-        print(f"{COLORS['brown']} python3 run.py = start {COLORS['reset']}")
-        print(f"{COLORS['brown']} nano config.json = edit {COLORS['reset']}")
-        
+        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ... ⚡{COLORS['reset']} {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         # ส่วนสถานะการเชื่อมต่อ
         print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
@@ -411,4 +439,12 @@ class VrscCpuMinerMonitor:
 
 if __name__ == "__main__":
     monitor = VrscCpuMinerMonitor()
-    monitor.run()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "run":
+            monitor.run()
+        elif sys.argv[1] == "edit":
+            monitor.edit_config()
+        else:
+            print("คำสั่งไม่ถูกต้อง ใช้: python vrsc_cpu_monitor.py [run|edit]")
+    else:
+        monitor.show_menu()
