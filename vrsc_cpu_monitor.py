@@ -24,7 +24,7 @@ class VrscCpuMinerMonitor:
         """แสดงเมนูหลัก"""
         while True:
             print("\n" + "="*30)
-            print(f"{COLORS['purple']}VRSC CPU Miner{COLORS['reset']}[{COLORS['green']}run{COLORS['reset']}|{COLORS['orange_text']}edit{COLORS['reset']}]")
+            print(f"{COLORS['purple']}VRSC CPU Miner{COLORS['reset']} {COLORS['green']}run{COLORS['reset']}|{COLORS['orange_text']}edit{COLORS['reset']}")
             print("="*30)
             print(f"{COLORS['green']}1. เริ่มการขุด (run){COLORS['reset']}")
             print(f"{COLORS['orange_text']}2. แก้ไข config (edit){COLORS['reset']}")
