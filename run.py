@@ -303,8 +303,8 @@ class VrscCpuMinerMonitor:
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ...{COLORS['reset']} {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         # คำสั่งต่างๆ
-        print(f"{COLORS['brown']} python3 run.py = start{COLORS['reset']}")
-        print(f"{COLORS['brown'] nano config.json = edit{COLORS['reset']}")
+        print(f"{COLORS['brown']} python3 run.py = start {COLORS['reset']}")
+        print(f"{COLORS['brown']} nano config.json = edit {COLORS['reset']}")
         
         # ส่วนสถานะการเชื่อมต่อ
         print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
