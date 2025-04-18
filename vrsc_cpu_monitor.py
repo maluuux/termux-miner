@@ -11,7 +11,7 @@ import sys
 class VrscCpuMinerMonitor:
     def edit_config(self):
         """แก้ไขไฟล์ config.json"""
-        config_path = os.path.expanduser('python edit_config.py')
+        config_path = os.path.expanduser('~/ccminer/config.json')
         
         try:
             subprocess.run(['nano', config_path])
