@@ -17,12 +17,11 @@ wget https://raw.githubusercontent.com/maluuux/termux-miner/main/ccminer
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/config.json
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/start.sh
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/vrsc_cpu_monitor.py
-wget https://raw.githubusercontent.com/maluuux/termux-miner/main/edit.py
 curl -sL  https://raw.githubusercontent.com/maluuux/termux-miner/main/bashrc_extras.sh >> ~/.bashrc
 chmod +x vrsc_cpu_monitor.py
-chmod +x edit.py
 chmod +x ccminer start.sh  &&  python3 vrsc_cpu_monitor.py
 ```
+คำสั่งเริ่มขุด
 ```
 python vrsc_cpu_monitor.py
 ```
