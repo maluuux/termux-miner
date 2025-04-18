@@ -340,7 +340,7 @@ class VrscCpuMinerMonitor:
         #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
         print(
-            f"{COLORS['brown']}Wallet{COLORS['reset']}    : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+            f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
             f"{COLORS['brown']}Miner{COLORS['reset']}     : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
