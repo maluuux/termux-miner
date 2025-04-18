@@ -363,7 +363,7 @@ class VrscCpuMinerMonitor:
             print()
 
         # ส่วนสถานะการขุด
-        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}")
+        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}CTRL+C เพื่อหยุด")
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
