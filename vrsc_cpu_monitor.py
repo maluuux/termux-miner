@@ -25,7 +25,7 @@ class VrscCpuMinerMonitor:
         while True:
             print("\n" + "=========================")
             print("VRSC CPU Miner run|edit ║")
-            print("========================="*30)
+            print("=========================")
             print("1. เริ่มการขุด (run)")
             print("2. แก้ไข config (edit)")
             print("3. ออกจากโปรแกรม")
