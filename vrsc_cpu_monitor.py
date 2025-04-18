@@ -23,9 +23,9 @@ class VrscCpuMinerMonitor:
     def show_menu(self):
         """แสดงเมนูหลัก"""
         while True:
-            print("\n" + "="*30)
-            print("VRSC CPU Miner run|edit")
-            print("="*30)
+            print("\n" + "=========================")
+            print("VRSC CPU Miner run|edit ║")
+            print("========================="*30)
             print("1. เริ่มการขุด (run)")
             print("2. แก้ไข config (edit)")
             print("3. ออกจากโปรแกรม")
@@ -334,10 +334,10 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']}⚡ VRSC Miner by ... ⚡{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']} 🔧 VRSC Miner Edit by..OK_error 🔧{COLORS['reset']}")
         print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         # ส่วนสถานะการเชื่อมต่อ
-        print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
+        #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
         print(
             f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
@@ -356,14 +356,14 @@ class VrscCpuMinerMonitor:
                          if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
 
         if recent_alerts:
-            print(f"{COLORS['purple']}🚨 แจ้งเตือนล่าสุด:{COLORS['reset']}")
+            print(f"📢{COLORS['white_bg']}{COLORS['purple']} Alarm {COLORS['reset']}⚠️")
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
                 print(f"{color_code}{alert['message']}{COLORS['reset']}")
             print()
 
         # ส่วนสถานะการขุด
-        print(f"{COLORS['purple']}=== สถานะการขุด {COLORS['reset']}{COLORS['green']} ( ͡◉ ͜ʖ ͡◉){COLORS['reset']}")
+        print(f"{COLORS['green']} 《《《 {COLORS['reset']}{COLORS['bold']}{COLORS['purple']}Working {COLORS['reset']}{COLORS['green']} 》》》{COLORS['reset']}")
         # ส่วนรันไทม์
         runtime = int(time.time() - self.start_time)
         hours = runtime // 3600
@@ -405,8 +405,8 @@ class VrscCpuMinerMonitor:
         ratio_color = 'green' if ratio > 95 else 'yellow' if ratio > 80 else 'red'
         print(f"  {COLORS['orange_bg']}{COLORS['black_text']}Shares{COLORS['reset']} : "
               f"{COLORS[ratio_color]}{ratio:.1f}%{COLORS['reset']}")
-        print(f"    {COLORS['bold']}{COLORS['orange_text']}├─ {COLORS['reset']}{COLORS['green']}Accepted: {accepted}{COLORS['reset']}")
-        print(f"    {COLORS['bold']}{COLORS['orange_text']}└─ {COLORS['reset']}{COLORS['red']}Rejected: {rejected}{COLORS['reset']}")
+        print(f"    {COLORS['bold']}{COLORS['orange_text']}├─ {COLORS['reset']}{COLORS['green']}Accepted ┑ {accepted}{COLORS['reset']}")
+        print(f"    {COLORS['bold']}{COLORS['orange_text']}└─ {COLORS['reset']}{COLORS['red']}Rejected ┙ {rejected}{COLORS['reset']}")
         
 
     def run(self):
@@ -427,7 +427,7 @@ class VrscCpuMinerMonitor:
                     self.display_dashboard()
 
         except KeyboardInterrupt:
-            print("\nกำลังหยุดการตรวจสอบ...")
+            print("\nกำลังหยุดการขุด...")
             self.running = False
         except Exception as e:
             self.add_alert_message('red', f"เกิดข้อผิดพลาด: {str(e)}")
