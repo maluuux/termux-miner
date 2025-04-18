@@ -20,7 +20,8 @@ wget https://raw.githubusercontent.com/maluuux/termux-miner/main/vrsc_cpu_monito
 wget https://raw.githubusercontent.com/maluuux/termux-miner/main/edit.py
 curl -sL  https://raw.githubusercontent.com/maluuux/termux-miner/main/bashrc_extras.sh >> ~/.bashrc
 chmod +x vrsc_cpu_monitor.py
-chmod +x ccminer start.sh &&  python3 vrsc_cpu_monitor.py
+chmod +x edit.py
+chmod +x ccminer start.sh  &&  python3 vrsc_cpu_monitor.py
 ```
 ```
 python vrsc_cpu_monitor.py
