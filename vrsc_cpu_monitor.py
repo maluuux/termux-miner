@@ -340,15 +340,15 @@ class VrscCpuMinerMonitor:
         #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
         print(
-            f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
+            f"{COLORS['brown']}Wallet{COLORS['reset']}    : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
-            f"{COLORS['brown']}Miner{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+            f"{COLORS['brown']}Miner{COLORS['reset']}     : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
-            f"{COLORS['brown']}Threads{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+            f"{COLORS['brown']}Threads{COLORS['reset']}   : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
             f"{COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
-            f"{COLORS['brown']}Password{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+            f"{COLORS['brown']}Password{COLORS['reset']}  : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
 
         # ส่วนแสดงแจ้งเตือน
         current_time = time.time()
