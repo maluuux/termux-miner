@@ -334,7 +334,7 @@ class VrscCpuMinerMonitor:
         print("\033[2J\033[H", end="")
 
         # ส่วนหัว
-        print(f"{COLORS['bold']}{COLORS['purple']} 🔧 VRSC Miner Edit by..OK_error 🔧{COLORS['reset']}")
+        print(f"{COLORS['bold']}{COLORS['purple']} 🚀🚀 VRSC Miner Edit by..OK_error 🚀🚀{COLORS['reset']}")
         print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
         # ส่วนสถานะการเชื่อมต่อ
         #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
@@ -380,7 +380,7 @@ class VrscCpuMinerMonitor:
         else:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} 🚀 🚀")
+              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} ⚡ ⚡")
 
         # แสดง difficulty
         difficulty = self.miner_data['difficulty']
