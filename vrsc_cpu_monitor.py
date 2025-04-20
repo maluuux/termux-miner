@@ -363,14 +363,8 @@ class VrscCpuMinerMonitor:
             print()
 
         # ส่วนสถานะการขุด
-        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}CTRL+C เพื่อหยุด")
-        # ส่วนรันไทม์
-        runtime = int(time.time() - self.start_time)
-        hours = runtime // 3600
-        minutes = (runtime % 3600) // 60
-        seconds = runtime % 60
-        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Run time{COLORS['reset']} : {COLORS['cyan']}{hours}:{minutes:02d}:{seconds:02d}{COLORS['reset']}")
-
+        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']} CTRL+C เพื่อหยุด")
+        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']}  : {COLORS['green_bg']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         # แสดง hashrate
         hashrate = self.miner_data['hashrate']
         if hashrate > 10000:
