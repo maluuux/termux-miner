@@ -41,8 +41,10 @@ class VrscCpuMinerMonitor:
                 break
             else:
                 print("⚠️ โปรดเลือกตัวเลือกที่ถูกต้อง")
+
     def __init__(self):
         self.hashrate_history = []
+        self.max_hashrate = 0  # เพิ่มตัวแปรเก็บค่าแรงขุดสูงสุด
         self.start_time = time.time()
         self.max_history = 30
         self.config = self.load_config()
@@ -67,17 +69,14 @@ class VrscCpuMinerMonitor:
 
     def clean_log_line(self, line):
         """ตรวจสอบและคัดกรองข้อความแจ้งเตือนจาก CC Miner"""
-        # ตรวจสอบข้อความแจ้งเตือนสีแดง (ERROR)
         red_alert = re.search(r'\x1b\[31m(.*?)\x1b\[0m', line)
         if red_alert:
             return ('red', red_alert.group(1).strip())
 
-        # ตรวจสอบข้อความแจ้งเตือนสีเหลือง (WARNING)
         yellow_alert = re.search(r'\x1b\[33m(.*?)\x1b\[0m', line)
         if yellow_alert:
             return ('yellow', yellow_alert.group(1).strip())
 
-        # ตรวจสอบข้อความสำคัญอื่นๆ
         important_messages = [
             'error', 'fail', 'warning', 'disconnect',
             'reject', 'timeout', 'disconnected', 'connection lost',
@@ -87,17 +86,16 @@ class VrscCpuMinerMonitor:
 
         line_lower = line.lower()
         if any(msg in line_lower for msg in important_messages):
-            # ลบรหัสสีและ timestamp
-            clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)  # ลบ ANSI color codes
-            clean_line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', clean_line)  # ลบ timestamp
-            clean_line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', clean_line)  # ลบ timestamp แบบอื่น
+            clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
+            clean_line = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', clean_line)
+            clean_line = re.sub(r'\(\d{2}:\d{2}:\d{2}\)', '', clean_line)
             return ('yellow', clean_line.strip())
 
         return None
 
     def add_alert_message(self, color, message):
         """เพิ่มข้อความแจ้งเตือนพร้อมระบุสี"""
-        if not message or len(message) > 200:  # จำกัดความยาวข้อความ
+        if not message or len(message) > 200:
             return
 
         timestamp = datetime.now().strftime('%H:%M:%S')
@@ -106,7 +104,6 @@ class VrscCpuMinerMonitor:
             'message': f"[{timestamp}] {message}",
             'time': time.time()
         })
-        # เก็บเฉพาะ 5 ข้อความล่าสุด
         if len(self.alert_messages) > 5:
             self.alert_messages.pop(0)
 
@@ -259,6 +256,12 @@ class VrscCpuMinerMonitor:
                                         'GH': 1000000000
                                     }
                                     value *= conversions.get(unit, 1)
+                                    
+                                    # อัพเดทค่าแรงขุดสูงสุด
+                                    if value > self.max_hashrate:
+                                        self.max_hashrate = value
+                                        self.add_alert_message('green', f"แรงขุดสูงสุดใหม่: {self.format_hashrate(value)}")
+                                    
                                     if value != self.miner_data['hashrate']:
                                         self.miner_data['hashrate'] = value
                                         updated = True
@@ -365,7 +368,8 @@ class VrscCpuMinerMonitor:
         # ส่วนสถานะการขุด
         print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']} CTRL+C เพื่อหยุด")
         print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']}  : {COLORS['green_bg']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        # แสดง hashrate
+        
+        # แสดง hashrate ปัจจุบัน
         hashrate = self.miner_data['hashrate']
         if hashrate > 10000:
             color = 'green'
@@ -375,6 +379,11 @@ class VrscCpuMinerMonitor:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
               f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} ⚡ ⚡")
+
+        # แสดง hashrate สูงสุด (Max Hashrate)
+        max_hr_color = 'purple'  # สีสำหรับแสดงค่าแรงขุดสูงสุด
+        print(f"  {COLORS['purple']}Max Hashrate{COLORS['reset']} : "
+              f"{COLORS[max_hr_color]}{self.format_hashrate(self.max_hashrate)}{COLORS['reset']} 🏆")
 
         # แสดง difficulty
         difficulty = self.miner_data['difficulty']
