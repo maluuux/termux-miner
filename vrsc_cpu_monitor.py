@@ -330,7 +330,8 @@ class VrscCpuMinerMonitor:
             'orange_bg': '\033[48;5;208m',
             'black_text': '\033[30m',
             'white_bg': '\033[48;5;15m',
-            'orange_text': '\033[38;5;208m'
+            'orange_text': '\033[38;5;208m',
+            'purple_bg': '\033[48;5;54m'
         }
 
         # ล้างหน้าจอ
@@ -366,8 +367,8 @@ class VrscCpuMinerMonitor:
             print()
 
         # ส่วนสถานะการขุด
-        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']} CTRL+C เพื่อหยุด")
-        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']}  : {COLORS['green_bg']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}")
+        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']} : {COLORS['green_bg']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         
         # แสดง hashrate ปัจจุบัน
         hashrate = self.miner_data['hashrate']
@@ -382,7 +383,7 @@ class VrscCpuMinerMonitor:
 
         # แสดง hashrate สูงสุด (Max Hashrate)
         max_hr_color = 'purple'  # สีสำหรับแสดงค่าแรงขุดสูงสุด
-        print(f"  {COLORS['purple']}Max Hashrate{COLORS['reset']} : "
+        print(f"  {COLORS['purple_bg']}{COLORS['green']}Max Hashrate{COLORS['reset']} : "
               f"{COLORS[max_hr_color]}{self.format_hashrate(self.max_hashrate)}{COLORS['reset']} 🏆")
 
         # แสดง difficulty
