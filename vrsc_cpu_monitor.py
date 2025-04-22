@@ -344,15 +344,15 @@ class VrscCpuMinerMonitor:
         #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
         print(
-            f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
             f"{COLORS['brown']}Miner{COLORS['reset']}     : {COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
-        print(
-            f"{COLORS['brown']}Threads{COLORS['reset']}   : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
             f"{COLORS['brown']}Algorithm{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('algo', 'ไม่ระบุ')}{COLORS['reset']}")
         print(
             f"{COLORS['brown']}Password{COLORS['reset']}  : {COLORS['orange_text']}{self.config.get('pass', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Threads{COLORS['reset']}   : {COLORS['orange_text']}{self.config.get('threads', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(
+            f"{COLORS['brown']}Wallet{COLORS['reset']} : {COLORS['orange_text']}{self.config.get('base_wallet', 'ไม่ระบุ')}{COLORS['reset']}")
 
         # ส่วนแสดงแจ้งเตือน
         current_time = time.time()
@@ -360,15 +360,15 @@ class VrscCpuMinerMonitor:
                          if current_time - alert['time'] < 300]  # แสดงแจ้งเตือนภายใน 5 นาที
 
         if recent_alerts:
-            print(f"  📢 {COLORS['white_bg']}{COLORS['purple']}Alarm{COLORS['reset']} ⚠️")
+            print(f"  📢 {COLORS['bold']}{COLORS['red']}Alarm{COLORS['reset']} ")
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
                 print(f"{color_code}{alert['message']}{COLORS['reset']}")
-        print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        print(f" {COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}")
-        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']} : {COLORS['green_bg']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']} : {COLORS['green_bg']}{COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         
         # แสดง hashrate ปัจจุบัน
         hashrate = self.miner_data['hashrate']
@@ -379,12 +379,12 @@ class VrscCpuMinerMonitor:
         else:
             color = 'red'
         print(f"  {COLORS['green_bg']}{COLORS['black_text']}Hashrate{COLORS['reset']} : "
-              f"{COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} ⚡ ⚡")
+              f"⚡ {COLORS[color]}{self.format_hashrate(hashrate)}{COLORS['reset']} ⚡")
 
         # แสดง hashrate สูงสุด (Max Hashrate)
         max_hr_color = 'purple'  # สีสำหรับแสดงค่าแรงขุดสูงสุด
         print(f"  {COLORS['purple_bg']}{COLORS['green']}Max Hashrate{COLORS['reset']} : "
-              f"{COLORS[max_hr_color]}{self.format_hashrate(self.max_hashrate)}{COLORS['reset']} 🏆")
+              f"{COLORS[max_hr_color]}{self.format_hashrate(self.max_hashrate)}{COLORS['reset']} 🚀")
 
         # แสดง difficulty
         difficulty = self.miner_data['difficulty']
