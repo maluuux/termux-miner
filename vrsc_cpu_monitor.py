@@ -368,7 +368,7 @@ class VrscCpuMinerMonitor:
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}")
-        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']} : {COLORS['green_bg']}{COLORS['orange_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
+        print(f"  {COLORS['white_bg']}{COLORS['black_text']}Miner{COLORS['reset']} : {COLORS['green_bg']}{COLORS['black_text']}{self.config.get('miner_name', 'ไม่ระบุ')}{COLORS['reset']}")
         
         # แสดง hashrate ปัจจุบัน
         hashrate = self.miner_data['hashrate']
