@@ -339,7 +339,7 @@ class VrscCpuMinerMonitor:
 
         # ส่วนหัว
         print(f"{COLORS['bold']}{COLORS['purple']} 🚀🚀 VRSC Miner Edit by..OK_error 🚀🚀{COLORS['reset']}")
-        print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
+        
         # ส่วนสถานะการเชื่อมต่อ
         #print(f"{COLORS['brown']}สถานะการเชื่อมต่อพูล :{COLORS['reset']} {self.miner_data['connection']['status']}")
         # ส่วนแสดง Config
@@ -364,7 +364,7 @@ class VrscCpuMinerMonitor:
             for alert in recent_alerts[-2:]:  # แสดง 2 ข้อความล่าสุด
                 color_code = COLORS[alert['color']]
                 print(f"{color_code}{alert['message']}{COLORS['reset']}")
-            print()
+        print(f"{COLORS['cyan']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{COLORS['reset']}")
 
         # ส่วนสถานะการขุด
         print(f"{COLORS['green']}《《《{COLORS['reset']}{COLORS['bold']}{COLORS['purple']} Working {COLORS['reset']}{COLORS['green']}》》》{COLORS['reset']}")
